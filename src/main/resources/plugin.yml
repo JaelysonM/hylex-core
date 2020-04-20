@@ -1,0 +1,5 @@
+author: Uzm Studio Inc.
+name: ${project.artifactId}
+version: ${project.version}
+
+main: ${main-bukkit}
