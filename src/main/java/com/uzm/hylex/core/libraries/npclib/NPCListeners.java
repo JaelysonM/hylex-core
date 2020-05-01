@@ -22,6 +22,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,6 +92,11 @@ public class NPCListeners implements Listener {
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
   public void onPlayerJoin(PlayerJoinEvent evt) {
     this.updateTracker.updatePlayer(evt.getPlayer(), 20 * 6, true);
+    Team team = evt.getPlayer().getScoreboard().getTeam("mNPCS");
+
+    if (team == null) {
+        
+    }
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

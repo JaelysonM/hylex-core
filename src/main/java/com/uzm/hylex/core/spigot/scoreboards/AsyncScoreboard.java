@@ -18,8 +18,8 @@ import java.util.*;
  *
  * @author MrMicky
  */
-public class asyncScoreboard {
-    public static Map<UUID, asyncScoreboard> boards = new HashMap<>();
+public class AsyncScoreboard {
+    public static Map<UUID, AsyncScoreboard> boards = new HashMap<>();
     private static final VersionType VERSION_TYPE;
 
     // Packets sending
@@ -109,7 +109,7 @@ public class asyncScoreboard {
      *
      * @param player the player the scoreboard is for
      */
-    public asyncScoreboard(Player player) {
+    public AsyncScoreboard(Player player) {
     	
     	boards.put(player.getUniqueId(), this);
         this.player = Objects.requireNonNull(player, "player");
@@ -556,13 +556,13 @@ public class asyncScoreboard {
         }
     }
     
-    public static asyncScoreboard get(Player p) {
+    public static AsyncScoreboard get(Player p) {
     	return boards.get(p.getUniqueId());
     }
     
     public static void destroy(Player p) {
     	
-    	  asyncScoreboard board = boards.remove(p.getUniqueId());
+    	  AsyncScoreboard board = boards.remove(p.getUniqueId());
     	  
     	  
     	  board.delete();

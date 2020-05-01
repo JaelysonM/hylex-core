@@ -1,6 +1,7 @@
 package com.uzm.hylex.core.libraries.npclib.npc;
 
 import com.google.common.base.Preconditions;
+import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.java.util.MathUtils;
 import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
 import com.uzm.hylex.core.libraries.npclib.api.NPC;
@@ -16,12 +17,14 @@ import com.uzm.hylex.core.libraries.npclib.trait.NPCTrait;
 import com.uzm.hylex.core.nms.NMS;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -41,6 +44,8 @@ public class AbstractNPC implements NPC {
 
     private MetadataStore data;
     private Map<Class<? extends NPCTrait>, NPCTrait> traits;
+
+    public boolean teamRegistred;
 
     public AbstractNPC(UUID uuid, String name, EntityController controller) {
         this.uuid = uuid;
@@ -100,6 +105,7 @@ public class AbstractNPC implements NPC {
         }
 
         getTrait(CurrentLocation.class).setLocation(getEntity().getLocation());
+
         return true;
     }
 
@@ -164,14 +170,15 @@ public class AbstractNPC implements NPC {
     @Override
     public void update() {
         if (isSpawned()) {
+
             if (ticksToUpdate++ > 30) {
                 ticksToUpdate = 0;
 
                 Entity entity = controller.getBukkitEntity();
                 if (entity instanceof Player) {
                     for (Player players : Bukkit.getServer().getOnlinePlayers()) {
-                        if (!NPCLibrary.isNPC(players)) {
 
+                        if (!NPCLibrary.isNPC(players)) {
                             Scoreboard sb = players.getScoreboard();
                             Team team = sb.getTeam("mNPCS");
                             if (data().get(HIDE_BY_TEAMS_KEY, false)) {
@@ -181,21 +188,24 @@ public class AbstractNPC implements NPC {
                                     team.setPrefix("§8[NPC] ");
                                 }
 
-                                if (!team.hasEntry(this.name)) {
-                                    team.addEntry(this.name);
+                                if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
+                                    team.addPlayer((Player) controller.getBukkitEntity());
+                                    teamRegistred=true;
                                 }
 
-                                continue;
                             }
 
                             if (team != null && team.getSize() == 0) {
                                 team.unregister();
                             }
+
                         }
                     }
                 }
             }
+
         }
+
     }
 
     public void updateInstant() {
@@ -204,19 +214,17 @@ public class AbstractNPC implements NPC {
             if (entity instanceof Player) {
                 for (Player players : Bukkit.getServer().getOnlinePlayers()) {
                     if (!NPCLibrary.isNPC(players)) {
-
                         Scoreboard sb = players.getScoreboard();
                         Team team = sb.getTeam("mNPCS");
                         if (data().get(HIDE_BY_TEAMS_KEY, false)) {
-                            System.out.println("UPDATED TAG");
                             if (team == null) {
                                 team = sb.registerNewTeam("mNPCS");
                                 team.setNameTagVisibility(NameTagVisibility.NEVER);
                                 team.setPrefix("§8[NPC] ");
                             }
 
-                            if (!team.hasEntry(this.name)) {
-                                team.addEntry(this.name);
+                            if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
+                                team.addPlayer((Player) controller.getBukkitEntity());
                             }
 
                             continue;
@@ -224,6 +232,7 @@ public class AbstractNPC implements NPC {
 
                         if (team != null && team.getSize() == 0) {
                             team.unregister();
+                            System.out.println("UNREGISTER");
                         }
                     }
                 }

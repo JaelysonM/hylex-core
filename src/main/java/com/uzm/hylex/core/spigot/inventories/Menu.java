@@ -1,9 +1,7 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 

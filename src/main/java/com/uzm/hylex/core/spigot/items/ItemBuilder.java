@@ -3,18 +3,20 @@ package com.uzm.hylex.core.spigot.items;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.uzm.hylex.core.Core;
-import com.uzm.hylex.core.PluginLoader;
-import org.bukkit.Material;
+import com.uzm.hylex.core.nms.NMS;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.logging.Level;
 
-public  class ItemBuilder {
+public class ItemBuilder {
     private ItemStack item;
     private ItemMeta meta;
     private List<String> lore;
@@ -30,57 +32,114 @@ public  class ItemBuilder {
         this(new ItemStack(mat));
     }
 
-    public ItemBuilder(String string) {
-        if ((string == null) || (string.isEmpty())) {
-            return;
+    public ItemBuilder(String item) {
+        if (item == null || item.isEmpty()) {
+            this.item = null;
         }
-        String[] split = string.split(" : ");
 
-        if (split[0].split(":").length > 1) {
-            this.item = new ItemStack(Material.matchMaterial(split[0].split(":")[0].toUpperCase()));
-        } else {
-            this.item = new ItemStack(Material.matchMaterial(split[0].toUpperCase()));
-        }
-        this.meta = this.item.getItemMeta();
-        this.lore = new ArrayList<>();
-        if (split.length > 1) {
-            try {
-                amount(Integer.parseInt(split[1]));
-            } catch (Exception ignored) {
+        try {
+            item = ChatColor.translateAlternateColorCodes('&', item.replace("\\n", "\n"));
+            String[] split = item.split(" : ");
+            String mat = split[0].split(":")[0];
+
+            ItemStack stack = new ItemStack(Material.matchMaterial(mat.toUpperCase()));
+            if (split[0].split(":").length > 1)
+                stack.setDurability((short) Integer.parseInt(split[0].split(":")[1]));
+            this.meta = stack.getItemMeta();
+
+            BookMeta book = meta instanceof BookMeta ? ((BookMeta) meta) : null;
+            SkullMeta skull = meta instanceof SkullMeta ? ((SkullMeta) meta) : null;
+            PotionMeta potion = meta instanceof PotionMeta ? ((PotionMeta) meta) : null;
+            FireworkEffectMeta effect = meta instanceof FireworkEffectMeta ? ((FireworkEffectMeta) meta) : null;
+            LeatherArmorMeta
+                    armor = meta instanceof LeatherArmorMeta ? ((LeatherArmorMeta) meta) : null;
+            EnchantmentStorageMeta enchantment = meta instanceof EnchantmentStorageMeta ? ((EnchantmentStorageMeta) meta) : null;
+
+            if (split.length > 1) {
+                stack.setAmount(Integer.parseInt(split[1]) > 64 ? 64 : Integer.parseInt(split[1]));
             }
+
+           this.lore = new ArrayList<>();
             for (int i = 2; i < split.length; i++) {
-                String splitted = split[i];
-                if (splitted.startsWith("name=")) {
-                    name(splitted.split("=")[1].replace("&", "§"));
+                String opt = split[i];
+
+                if (opt.startsWith("display=")) {
+                    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', opt.split("=")[1]));
                 }
-                if (splitted.startsWith("glow=")) {
-                    if (Boolean.parseBoolean(splitted.split("glow=")[1])) {
-                        glow = true;
+
+                if (opt.startsWith("lore=")) {
+                    for (String lored : opt.split("=")[1].split("\n")) {
+                        lore.add(ChatColor.translateAlternateColorCodes('&', lored));
                     }
                 }
-                if (splitted.startsWith("enchant=")) {
-                    for (int j = 0; j < splitted.split("=")[1].split("/").length; j++) {
-                        if (splitted.split("=")[1].split("/")[j].split(":").length > 1) {
-                            try {
-                                enchant(getEnchant(splitted.split("=")[1].split("/")[j].split(":")[0]),
-                                        Integer.parseInt(splitted.split("=")[1].split("/")[j].split(":")[1]));
 
-                            } catch (Exception localException2) {
-                                localException2.printStackTrace();
-                            }
+                if (opt.startsWith("enchantments=")) {
+                    for (String enchanted : opt.split("=")[1].split("\n")) {
+                        if (enchantment != null) {
+                            enchantment.addStoredEnchant(Enchantment.getByName(enchanted.split(":")[0]), Integer.parseInt(enchanted.split(":")[1]), true);
+                            continue;
+                        }
+
+                        meta.addEnchant(Enchantment.getByName(enchanted.split(":")[0]), Integer.parseInt(enchanted.split(":")[1]), true);
+                    }
+                }
+
+                if (opt.startsWith("owner=") && skull != null) {
+                    skull.setOwner(opt.split("=")[1]);
+                }
+
+                if (opt.startsWith("skinvalue=") && skull != null) {
+                    try {
+                        GameProfile gp = new GameProfile(UUID.randomUUID(), null);
+                        gp.getProperties().put("textures", new Property("textures", opt.split("=")[1]));
+                        Field f = skull.getClass().getDeclaredField("profile");
+                        f.setAccessible(true);
+                        f.set(meta, gp);
+                    } catch (ReflectiveOperationException ex) {
+                        Core.getInstance().getLogger().log(Level.WARNING, "Unexpected error ocurred profile on skull: ", ex);
+                    }
+                }
+
+                if (opt.startsWith("page=") && book != null) {
+                    book.setPages(opt.split("=")[1].split("\\{page\\}"));
+                }
+
+                if (opt.startsWith("author=") && book != null) {
+                    book.setAuthor(opt.split("=")[1]);
+                }
+
+                if (opt.startsWith("title=") && book != null) {
+                    book.setTitle(opt.split("=")[1]);
+                }
+
+                if (opt.startsWith("effect=") && potion != null) {
+                    String[] splitter = opt.split("=")[1].split("\n");
+                    potion.addCustomEffect(new PotionEffect(PotionEffectType.getByName(splitter[0]), Integer.parseInt(splitter[2]), Integer.parseInt(splitter[1])), false);
+                }
+
+                if (opt.startsWith("flags=")) {
+                    String[] flags = opt.split("=")[1].split("\n");
+                    for (String flag : flags) {
+                        if (flag.equalsIgnoreCase("all")) {
+                            meta.addItemFlags(ItemFlag.values());
+                            break;
+                        } else {
+                            meta.addItemFlags(ItemFlag.valueOf(flag.toUpperCase()));
                         }
                     }
                 }
-                List<String> lore = new ArrayList<>();
-                if (splitted.startsWith("lore=")) {
-                    for (int j = 0; j < splitted.split("=")[1].split("/").length; j++) {
-                        lore.add(splitted.split("=")[1].split("/")[j].replace("&", "§"));
-                    }
-                }
-                if (lore.size() >= 1) {
-                    lore((String[]) lore.toArray(new String[0]));
-                }
             }
+            if (!lore.isEmpty()) {
+                meta.setLore(lore);
+            }
+
+            stack.setItemMeta(meta);
+
+            this.item = stack;
+        } catch (Exception ex) {
+            Core.getInstance().getLogger().log(Level.WARNING, "Cant deserializeItem() from \"" + item + "\"", ex);
+            this.item = new ItemStack(Material.BARRIER, 1);
+
         }
     }
 
@@ -110,7 +169,7 @@ public  class ItemBuilder {
         if (this.item == null) {
             return this;
         }
-        this.meta.setDisplayName(dis);
+        this.meta.setDisplayName(dis.replace("&", "§"));
         return this;
     }
 
@@ -133,8 +192,10 @@ public  class ItemBuilder {
     }
 
 
-    public  ItemStack glow() {
-        return Core.getLoader().getNms().glow(this.item);
+    public ItemStack glow() {
+
+        return NMS.glow(this.item);
+
     }
 
     public ItemStack build(boolean glow) {
@@ -146,7 +207,7 @@ public  class ItemBuilder {
         if (this.meta != null) {
             this.item.setItemMeta(this.meta);
         }
-        return glow ? (ItemStack) glow() : this.item;
+        return glow ? glow() : this.item;
     }
 
     public ItemStack build() {
@@ -158,77 +219,43 @@ public  class ItemBuilder {
         if (this.meta != null) {
             this.item.setItemMeta(this.meta);
         }
-        return glow ? (ItemStack) glow() : this.item;
+        return glow ? glow() : this.item;
     }
 
-    public ItemStack skin(String url) {
-        SkullMeta skullMeta = (SkullMeta)item.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        byte[] encodedData = Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", new Object[] { url }).getBytes());
-        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
 
-        Field profileField = null;
-        try
-        {
-            profileField = skullMeta.getClass().getDeclaredField("profile");
-        }
-        catch (NoSuchFieldException|SecurityException e)
-        {
-            e.printStackTrace();
-        }
-        assert (profileField != null);
-        profileField.setAccessible(true);
-        try
-        {
-            profileField.set(skullMeta, profile);
-        }
-        catch (IllegalArgumentException|IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-        item.setItemMeta(skullMeta);
+    public ItemBuilder updateLoreLine(int line, String text) {
 
-        return item;
+        if (item.getItemMeta().hasLore()) {
+            List<String> lores = new ArrayList<String>(item.getItemMeta().getLore());
+            if (lores.get(line) != null) {
+                lores.set(line, text);
+                item.getItemMeta().setLore(lores);
+            }
+
+        }
+
+        return this;
     }
-/*
-    public static ItemStack itemFromUrl(String url)
-    {
 
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short)3);
-        if ((url == null) || (url.isEmpty())) {
-            return skull;
+    public ItemBuilder color(Color color){
+        ItemMeta meta = this.item.getItemMeta();
+        if (meta != null && meta instanceof LeatherArmorMeta){
+            ((LeatherArmorMeta) meta).setColor(color);
+            this.item.setItemMeta(meta);
         }
-        SkullMeta skullMeta = (SkullMeta)skull.getItemMeta();
-        skullMeta.setDisplayName(ChatColor.values()[new Random().nextInt(ChatColor.values().length)] + "AdvancedCosmetics");
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-        byte[] encodedData = org.apache.commons.codec.binary.Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", new Object[] { url }).getBytes());
-
-
-        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
-        Field profileField = null;
-        try
-        {
-            profileField = skullMeta.getClass().getDeclaredField("profile");
-        }
-        catch (NoSuchFieldException|SecurityException e)
-        {
-            e.printStackTrace();
-        }
-        assert (profileField != null);
-        profileField.setAccessible(true);
-        try
-        {
-            profileField.set(skullMeta, profile);
-        }
-        catch (IllegalArgumentException|IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-        skull.setItemMeta(skullMeta);
-        return skull;
+        return this;
     }
-*/
+
+    public ItemBuilder skinFromValue(String value) {
+
+        UUID hashAsId = new UUID(value.hashCode(), value.hashCode());
+        Bukkit.getUnsafe().modifyItemStack(item,
+                "{SkullOwner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + value + "\"}]}}}"
+        );
+        return this;
+    }
+
+
     public Enchantment getEnchant(String enchant) {
         switch (enchant.toLowerCase()) {
             case "protection":

@@ -1,18 +1,15 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.spigot.enums.MaterialEnums;
 import com.uzm.hylex.core.spigot.enums.SoundEnums;
 import com.uzm.hylex.core.spigot.items.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 

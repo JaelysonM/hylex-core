@@ -22,6 +22,12 @@ public class Skin {
     this.signature = signature;
   }
 
+  public String getValue() {
+    return value;
+  }
+  public String getSignature() {
+    return signature;
+  }
 
 
   private Skin fetch(String name) {

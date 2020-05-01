@@ -1,6 +1,5 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
-import com.uzm.hylex.core.Core;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;

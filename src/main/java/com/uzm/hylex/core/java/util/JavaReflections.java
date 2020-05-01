@@ -2,7 +2,10 @@ package com.uzm.hylex.core.java.util;
 
 
 import com.uzm.hylex.core.Core;
+import com.uzm.hylex.core.nms.reflections.Accessors;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,14 +35,14 @@ public class JavaReflections
         throw new NoSuchMethodException("There is no such method in this class with the specified name and parameter types");
     }
     @SuppressWarnings("resource")
-    public static List<Class<?>> getClasses(String packageName) {
+    public static List<Class<?>> getClasses(String packageName, JavaPlugin plugin) {
 
         List<Class<?>> classes = new ArrayList<>();
         packageName = packageName.replaceAll("\\." , "/");
         try {
 
             JarInputStream jarFile = new JarInputStream
-                    (new FileInputStream (Core.getPath()));
+                    (new FileInputStream (Accessors.getField(JavaPlugin.class, "file", File.class).get(plugin)));
 
             while (true) {
                 JarEntry jar = jarFile.getNextJarEntry();

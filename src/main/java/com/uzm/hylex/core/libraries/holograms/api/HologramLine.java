@@ -43,8 +43,7 @@ public class HologramLine {
 
   public void setLine(String line) {
     if (this.line.equals(ChatColor.translateAlternateColorCodes('&',line))) {
-      this.armor.setName(this.line + "§r");
-      this.line = this.line + "§r";
+      this.armor.setName(this.line );
       return;
     }
     

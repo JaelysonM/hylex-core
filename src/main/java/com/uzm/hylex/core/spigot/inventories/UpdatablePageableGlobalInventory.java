@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -10,26 +10,31 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
-public class UpdatablePageablePlayerInventory implements Listener {
+public class UpdatablePageableGlobalInventory implements Listener {
 
-    private Player viewer;
 
     private Inventory baseInventory;
 
     private String title;
 
-    private int[] occupiedSlots;
+    private Map<ItemStack, Object> attached = new HashMap<>();
 
-    private ItemStack occupyItem = new ItemStack(Material.AIR);
+    public void attachObject(ItemStack item, Object value) {
+        this.attached.put(item, value);
+    }
 
-    private int currentPage;
+    public Object getAttached(ItemStack item) {
+        return this.attached.get(item);
+    }
+
     private int[] availableSlots;
-    private int endSlot;
 
     private ItemStack[] baseinventoryContent;
 
@@ -38,34 +43,25 @@ public class UpdatablePageablePlayerInventory implements Listener {
     private Object[] emptyItem;
 
 
-    public UpdatablePageablePlayerInventory(Player viewer, Inventory base, String title) {
-        this.viewer = viewer;
+    public UpdatablePageableGlobalInventory(Inventory base, String title) {
         this.baseInventory = base;
         this.title = title.replace("&", "§");
         Bukkit.getServer().getPluginManager().registerEvents(this, Core.getInstance());
 
     }
 
-    public UpdatablePageablePlayerInventory config(ItemStack ocupeItem, int[] occupiedSlots) {
-        this.occupyItem = ocupeItem;
-        this.occupiedSlots = occupiedSlots;
-        this.availableSlots = Ints.toArray(Ints.asList(IntStream.range(0, this.baseInventory.getSize()).toArray()).stream().filter(value -> !Ints.asList(occupiedSlots).contains(value)).collect(Collectors.toList()));
-
+    public UpdatablePageableGlobalInventory config(int[] availableSlots) {
+        this.availableSlots = availableSlots;
         return this;
     }
 
-    public UpdatablePageablePlayerInventory fill(ItemStack[] content, Object[][] actionItems, Object[][] fixedContent, Object[] emptyItem, int endSlot) {
+    public UpdatablePageableGlobalInventory fill(ItemStack[] content, Object[][] actionItems, Object[][] fixedContent, Object[] emptyItem) {
         int totalPages = getTotalPages(content);
         int inventorySize = (int) Math.ceil(baseInventory.getSize() / 9.0D) * 9;
-        int currentSlot= availableSlots[0];
-        this.endSlot=endSlot;
-
+        int index= 0;
 
        baseinventoryContent = new ItemStack[inventorySize];
 
-        for (int occupy : occupiedSlots) {
-            baseinventoryContent[occupy] = occupyItem;
-        }
         for (Object[] o : fixedContent) {
             baseinventoryContent[(Integer) o[1]] = (ItemStack) o[0];
         }
@@ -79,11 +75,11 @@ public class UpdatablePageablePlayerInventory implements Listener {
             return this;
         }
         for (int in = 0; in < content.length; in++) {
-            if(inventoryContent[currentSlot]  == null) {
-                inventoryContent[currentSlot] = content[in];
+            if(inventoryContent[availableSlots[index]]  == null) {
+                inventoryContent[availableSlots[index]] = content[in];
             }
-            currentSlot++;
-            if (currentSlot ==  endSlot || (in + 1) == content.length) {
+            index++;
+            if (index ==  availableSlots[availableSlots.length-1] || (in + 1) == content.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);
@@ -93,7 +89,7 @@ public class UpdatablePageablePlayerInventory implements Listener {
                 }
                 this.pages.add(inv);
                 inventoryContent= baseinventoryContent.clone();
-                currentSlot=availableSlots[0];
+                index=0;
             }
         }
 
@@ -101,11 +97,11 @@ public class UpdatablePageablePlayerInventory implements Listener {
     }
 
     public void update(ItemStack[] newContent) {
-        int currentSlot= availableSlots[0];
+        int index= 0;
         int totalPages = getTotalPages(newContent);
         int inventorySize = (int) Math.ceil(baseInventory.getSize() / 9.0D) * 9;
         ItemStack[] inventoryContent = baseinventoryContent.clone();
-
+        this.pages.clear();
         if (newContent.length == 0) {
             Inventory inv = Bukkit.createInventory(null, inventoryContent.length, title.replace("{c}", (pages.size() + 1) + "").replace("{m}",  totalPages+ ""));
             inv.setContents(inventoryContent);
@@ -114,11 +110,11 @@ public class UpdatablePageablePlayerInventory implements Listener {
             return ;
         }
         for (int in = 0; in < newContent.length; in++) {
-            if(inventoryContent[currentSlot]  == null) {
-                inventoryContent[currentSlot] = newContent[in];
+            if(inventoryContent[availableSlots[index]]  == null) {
+                inventoryContent[availableSlots[index]] = newContent[in];
             }
-            currentSlot++;
-            if (currentSlot ==  endSlot || (in + 1) == newContent.length) {
+            index++;
+            if (index ==  availableSlots[availableSlots.length-1] || (in + 1) == newContent.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);
@@ -128,7 +124,7 @@ public class UpdatablePageablePlayerInventory implements Listener {
                 }
                 this.pages.add(inv);
                 inventoryContent= baseinventoryContent.clone();
-                currentSlot=availableSlots[0];
+                index=0;
             }
         }
     }
@@ -143,10 +139,9 @@ public class UpdatablePageablePlayerInventory implements Listener {
         }
     }
 
-    public UpdatablePageablePlayerInventory open(Player player, int page) {
+    public UpdatablePageableGlobalInventory open(Player player, int page) {
         if (page > 0 && page <= this.pages.size()) {
             if (player != null) {
-                currentPage = page;
                 player.openInventory(this.pages.get(page - 1));
             }
         }
@@ -154,22 +149,15 @@ public class UpdatablePageablePlayerInventory implements Listener {
 
     }
 
-    public boolean exists(Inventory inv) {
-        return ((Inventory) this.pages.get(this.currentPage - 1)).equals(inv);
+    public boolean exists(Inventory inv, int currentPage) {
+        return ((Inventory) this.pages.get(currentPage - 1)).equals(inv);
     }
 
-    public UpdatablePageablePlayerInventory destroy() {
+    public UpdatablePageableGlobalInventory destroy() {
         pages.clear();
         return this;
     }
 
-    public int getCurrent() {
-        return currentPage;
-    }
-
-    public Player getPlayer() {
-        return viewer;
-    }
 
     private List<Inventory> pages = Lists.newArrayList();
 }

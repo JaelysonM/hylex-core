@@ -51,11 +51,7 @@ public class SkinUpdateTracker {
     double viewDistance = 50.0;
     viewDistance *= viewDistance;
 
-    if (playerLoc.distanceSquared(skinLoc) > viewDistance) {
-      return false;
-    }
-
-    return true;
+    return !(playerLoc.distanceSquared(skinLoc) > viewDistance);
   }
 
   private Iterable<NPC> getAllNPCs() {

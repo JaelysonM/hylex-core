@@ -45,19 +45,23 @@
             <artifactId>spigot-1.8.8</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>D:/dev/depedencies/jars/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>D:/dev/jars/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-1.14.4</artifactId>
             <version>1.14.4-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>D:/dev/depedencies/jars/spigot-1.14.4.jar</systemPath>
+            <systemPath>D:/dev/jars/spigot-1.14.4.jar</systemPath>
         </dependency>
-
-
+        <dependency>
+            <groupId>uzm</groupId>
+            <artifactId>hylex-services</artifactId>
+            <version>1.0.1</version>
+            <scope>system</scope>
+            <systemPath>D:/dev/maven-builds/hylex-services-1.0.1.jar</systemPath>
+        </dependency>
     </dependencies>
-
 
     <build>
         <defaultGoal>clean install</defaultGoal>

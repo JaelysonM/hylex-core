@@ -3,6 +3,8 @@ package com.uzm.hylex.core.libraries.holograms.api;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
 import org.bukkit.Location;
 import com.google.common.collect.ImmutableList;
 
@@ -11,6 +13,8 @@ public class Hologram {
   private boolean spawned;
   private Location location;
   private Map<Integer, HologramLine> lines = new HashMap<>();
+
+  private List<String> defaultLines = Lists.newArrayList();
 
   public Hologram(Location location, String... lines) {
     this.location = location;
@@ -65,7 +69,12 @@ public class Hologram {
     hl.setLine(line);
     return this;
   }
-  
+
+
+  public void setDefaultLines( List<String> l) {
+    defaultLines= l;
+  }
+
   public boolean isSpawned() {  
     return spawned;
   }
@@ -76,5 +85,9 @@ public class Hologram {
   
   public List<HologramLine> getLines() {
     return ImmutableList.copyOf(lines.values());
+  }
+
+  public List<String> getDefaultLines() {
+    return defaultLines;
   }
 }

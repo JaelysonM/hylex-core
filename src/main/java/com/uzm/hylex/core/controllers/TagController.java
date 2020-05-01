@@ -1,135 +1,119 @@
 package com.uzm.hylex.core.controllers;
 
-import com.google.common.collect.Maps;
-import com.uzm.hylex.core.Core;
+import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
 
 public class TagController {
 
-    public static HashMap<String, TagController> tags = Maps.newHashMap();
+  private String uuid;
+  private String prefix = "§7";
+  private String suffix = "";
+  private String order = "z";
+  private Player player;
+  private Team team;
 
-    private String uuid;
-    private String prefix = "§7";
-    private String suffix = "";
-    private String order = "z";
-    private Player player;
-    private Team team;
+  public TagController(String uuid) {
+    this.uuid = uuid;
+    this.player = Bukkit.getPlayer(UUID.fromString(uuid));
+  }
 
-
-    public TagController(String uuid) {
-        this.uuid = uuid;
-        this.player = Bukkit.getPlayer(UUID.fromString(uuid));
+  public void update() {
+    if (this.team == null) {
+      Team team = getTeam(this.player.getScoreboard(),
+        order + (this.player.getUniqueId().toString().length() > 15 ? this.player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString()));
+      team.setPrefix(prefix);
+      team.setSuffix(suffix);
+      team.addPlayer(player);
+      setTeam(team);
+      return;
     }
 
-
-    public void setPrefix(String p) {
-        this.prefix = p;
+    if (!this.team.getName().equalsIgnoreCase(
+      this.order + (this.player.getUniqueId().toString().length() > 15 ? player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString()))) {
+      this.team.unregister();
+      setTeam(getTeam(this.player.getScoreboard(),
+        order + (this.player.getUniqueId().toString().length() > 15 ? this.player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString())));
     }
 
-    public void setSuffix(String s) {
-        this.suffix = s;
+    this.team.setPrefix(prefix);
+    this.team.setSuffix(suffix);
+    if (!this.team.hasPlayer(player)) {
+      this.team.addPlayer(player);
     }
+  }
 
-    public void setOrder(String s) {
+  public void setTeam(Team team) {
+    this.team = team;
+  }
 
-        this.order = s;
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
+  }
+
+  public void setSuffix(String suffix) {
+    this.suffix = suffix;
+  }
+
+  public void setOrder(String order) {
+    this.order = order;
+  }
+
+  public Team getTeam() {
+    return this.team;
+  }
+
+  public String getSuffix() {
+    return this.suffix;
+  }
+
+  public String getPrefix() {
+    return this.prefix;
+  }
+
+  public String getUUID() {
+    return this.uuid;
+  }
+
+  public String getOrder() {
+    return this.order;
+  }
+
+  public Player getPlayer() {
+    return this.player;
+  }
+
+  private static final Map<String, TagController> TAGS = new HashMap<>();
+
+  public static TagController create(Player player) {
+    TAGS.computeIfAbsent(player.getUniqueId().toString(), result -> new TagController(player.getUniqueId().toString()));
+    return get(player);
+  }
+
+  public static TagController remove(Player player) {
+    return TAGS.remove(player.getUniqueId().toString());
+  }
+
+  public static TagController get(Player player) {
+    return TAGS.getOrDefault(player.getUniqueId().toString(), null);
+  }
+
+  public static List<TagController> getControllers() {
+    return ImmutableList.copyOf(TAGS.values());
+  }
+
+  public static Team getTeam(Scoreboard board, String name) {
+    if (board.getTeam(name) != null) {
+      return board.getTeam(name);
+    } else {
+      return board.registerNewTeam(name);
     }
-
-    public String getSuffix() {return suffix;}
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getUUID() {
-        return uuid;
-    }
-
-    public String getOrder() {
-        return order;
-    }
-
-    public Player getPlayer() {
-        return player;
-
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-    public void setTeam(Team team) {
-        this.team=team;
-    }
-
-    public static void create(Player p) {
-        tags.computeIfAbsent(p.getUniqueId().toString(), result -> new TagController(p.getUniqueId().toString()));
-    }
-
-    public static void delete(Player p) {
-        tags.remove(p.getUniqueId().toString());
-
-    }
-
-
-    public static TagController get(Player p) {
-        return tags.getOrDefault(p.getUniqueId().toString(), null);
-    }
-
-
-    public static void task() {
-        new BukkitRunnable() {
-
-            public void run() {
-                getDatas().forEach(TagController::update);
-            }
-        }.runTaskTimerAsynchronously(Core.getInstance(), 20L, 60L);
-    }
-
-
-    public static ArrayList<TagController> getDatas() {
-        return new ArrayList<>(tags.values());
-    }
-
-    public static Team getTeam(Scoreboard board, String name) {
-        if (board.getTeam(name) != null) {
-            return board.getTeam(name);
-        } else {
-            return board.registerNewTeam(name);
-        }
-    }
-
-
-    public void update() {
-         if (getTeam() == null) {
-             Team team = getTeam(player.getScoreboard(), order + (player.getUniqueId().toString().length() > 15 ? player.getUniqueId().toString().substring(0, 15) : player.getUniqueId().toString()));
-             team.setPrefix(prefix);
-             team.setSuffix(suffix);
-             team.addPlayer(player);
-             setTeam(team);
-             return;
-         }
-
-        if (!getTeam().getName().equalsIgnoreCase(order + (player.getUniqueId().toString().length() > 15 ? player.getUniqueId().toString().substring(0, 15) : player.getUniqueId().toString()))) {
-            getTeam().unregister();
-            Team team = getTeam(player.getScoreboard(), order + (player.getUniqueId().toString().length() > 15 ? player.getUniqueId().toString().substring(0, 15) : player.getUniqueId().toString()));
-            setTeam(team);
-        }
-
-        getTeam().setPrefix(prefix);
-        getTeam().setSuffix(suffix);
-
-            if (!getTeam().hasPlayer(player))
-            getTeam().addPlayer(player);
-
-
-    }
+  }
 }

@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;

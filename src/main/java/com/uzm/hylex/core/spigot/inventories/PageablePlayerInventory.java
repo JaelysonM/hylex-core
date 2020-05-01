@@ -1,6 +1,8 @@
-package com.uzm.hylex.core.spigot.inventorys;
+package com.uzm.hylex.core.spigot.inventories;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,9 +26,19 @@ public class PageablePlayerInventory implements Listener {
 
     private String title;
 
-    private int[] ocupedSlots;
 
     private ItemStack ocupeItem = new ItemStack(Material.AIR);
+
+    private Map<ItemStack, Object> attached = new HashMap<>();
+
+    public void attachObject(ItemStack item, Object value) {
+        this.attached.put(item, value);
+    }
+
+    public Object getAttached(ItemStack item) {
+        return this.attached.get(item);
+    }
+
 
 
     private int now;
@@ -40,24 +52,18 @@ public class PageablePlayerInventory implements Listener {
 
     }
 
-    public PageablePlayerInventory config(ItemStack ocupeItem, int[] slots) {
-        this.ocupeItem = ocupeItem;
-        this.ocupedSlots = slots;
-        this.availableSlots = Ints.toArray(Ints.asList(IntStream.range(0, this.baseInventory.getSize()).toArray()).stream().filter(value -> !Ints.asList(slots).contains(value)).collect(Collectors.toList()));
-
+    public PageablePlayerInventory config(int[] avaliableSlots) {
+        this.availableSlots = avaliableSlots;
         return this;
     }
 
-    public PageablePlayerInventory fill(ItemStack[] content, Object[][] actionItems, Object[][] fixedContent, Object[] emptyItem, int endSlot) {
+    public PageablePlayerInventory fill(ItemStack[] content, Object[][] actionItems, Object[][] fixedContent, Object[] emptyItem) {
         int totalPages = getTotalPages(content);
         int inventorySize = (int) Math.ceil(baseInventory.getSize() / 9.0D) * 9;
-        int currentSlot= availableSlots[0];
+        int index= 0;
 
         ItemStack[] basementContent = new ItemStack[inventorySize];
 
-        for (int occupy : ocupedSlots) {
-            basementContent[occupy] = ocupeItem;
-        }
         for (Object[] o : fixedContent) {
             basementContent[(Integer) o[1]] = (ItemStack) o[0];
         }
@@ -71,11 +77,11 @@ public class PageablePlayerInventory implements Listener {
             return this;
         }
         for (int in = 0; in < content.length; in++) {
-            if(inventoryContent[currentSlot]  == null) {
-                inventoryContent[currentSlot] = content[in];
+            if(inventoryContent[availableSlots[index]]  == null) {
+                inventoryContent[availableSlots[index]] = content[in];
             }
-            currentSlot++;
-            if (currentSlot ==  endSlot || (in + 1) == content.length) {
+            index++;
+            if (index ==  availableSlots[availableSlots.length-1] || (in + 1) == content.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);
@@ -85,7 +91,7 @@ public class PageablePlayerInventory implements Listener {
                 }
                 this.pages.add(inv);
                 inventoryContent= basementContent.clone();
-                currentSlot=availableSlots[0];
+                index=0;
             }
         }
 
@@ -130,4 +136,8 @@ public class PageablePlayerInventory implements Listener {
     }
 
     private List<Inventory> pages = Lists.newArrayList();
+
+    public List<Inventory> getPages() {
+        return pages;
+    }
 }

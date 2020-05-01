@@ -2,21 +2,19 @@ package com.uzm.hylex.core.libraries.npclib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.libraries.npclib.api.NPC;
 import com.uzm.hylex.core.libraries.npclib.api.npc.EntityController;
 import com.uzm.hylex.core.libraries.npclib.npc.AbstractNPC;
 import com.uzm.hylex.core.libraries.npclib.npc.EntityControllers;
 import com.uzm.hylex.core.libraries.npclib.npc.ai.NPCHolder;
-import com.uzm.hylex.core.libraries.npclib.npc.skin.Skin;
-import com.uzm.hylex.core.plugin.logger.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 import java.util.*;
@@ -30,9 +28,7 @@ public class NPCLibrary {
   private static Listener LISTENER;
   private static List<NPC> npcs = new ArrayList<>();
 
-  private static HashMap<String, Skin> cacheSkins = Maps.newHashMap();
 
- // public static final Logger LOGGER = ((Logger) Core.getInstance().getLogger()).getModule("NPCS");
 
   public static void setupNPCs(Core pl) {
     if (pl == null || plugin != null) {
@@ -42,6 +38,9 @@ public class NPCLibrary {
     plugin = pl;
     LISTENER = new NPCListeners();
     Bukkit.getServer().getPluginManager().registerEvents(LISTENER, pl);
+
+
+
   }
 
   public static NPC createNPC(EntityType type, String name) {
@@ -88,8 +87,9 @@ public class NPCLibrary {
     return ImmutableList.copyOf(npcs);
   }
 
-  public static HashMap<String,Skin>getCachedSkins() {
-    return cacheSkins;
 
+  public static List<NPC> getNpcs() {
+    return npcs;
   }
+
 }
