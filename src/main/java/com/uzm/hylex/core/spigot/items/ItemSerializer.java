@@ -38,8 +38,11 @@ public class ItemSerializer {
           }
 
 
-
+       destroy();
         return sb.toString();
     }
 
+    public void destroy() {
+        this.toSerialize=null;
+    }
 }

@@ -152,7 +152,7 @@ public class SelfHologram {
             // Create and add the associated show and hide packets.
             showPackets.add(PACKET_PLAY_OUT_SPAWN_ENTITY_LIVING_CONSTRUCTOR.invoke(entityArmorStand));
             hidePackets.add(PACKET_PLAY_OUT_ENTITY_DESTROY_CONSTRUCTOR
-                    .invoke(new int[]{(int) GET_ID_METHOD.invoke(entityArmorStand)}));
+                    .invoke((Object) new int[]{(int) GET_ID_METHOD.invoke(entityArmorStand)}));
             // For 1.15 R1 and up.
             metaPackets.add(PACKET_PLAY_OUT_ENTITY_METADATA_CONSTRUCTOR.invoke(
                     GET_ID_METHOD.invoke(entityArmorStand),

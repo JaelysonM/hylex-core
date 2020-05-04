@@ -1,6 +1,7 @@
 package com.uzm.hylex.core.java.util;
 
 import com.google.common.collect.Maps;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,65 +12,78 @@ import java.util.HashMap;
 public class ConfigurationBuilder {
 
 
-    public static HashMap<String, ConfigurationBuilder> configs = Maps.newHashMap();
+  public static HashMap<String, ConfigurationBuilder> configs = Maps.newHashMap();
 
 
-    private File file;
+  private File file;
 
-    private JavaPlugin plugin;
+  private JavaPlugin plugin;
 
-    private YamlConfiguration yamlConfiguration;
+  private YamlConfiguration yamlConfiguration;
 
-    public ConfigurationBuilder(JavaPlugin plugin, String filename) {
-        this.plugin = plugin;
+  public ConfigurationBuilder(JavaPlugin plugin, String filename) {
+    this.plugin = plugin;
 
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
-        }
+    if (!plugin.getDataFolder().exists()) {
+      plugin.getDataFolder().mkdirs();
+    }
 
 
-        file = new File(plugin.getDataFolder(), filename + ".yml");
+    file = new File(plugin.getDataFolder(), filename + ".yml");
 
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                System.err.println("[Hylex - Core] Ocorreu um erro ao criar o arquivo " + filename + ".yml");
-            }
-        }
+    if (!file.exists()) {
+      try {
+        file.createNewFile();
         load();
+        loadByResource();
         save();
 
-        configs.put(filename, this);
-    }
-
-    public void load() {
-
-        yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-    }
-
-    public YamlConfiguration get() {
-        return yamlConfiguration;
+      } catch (IOException e) {
+        System.err.println("[Hylex - Core] Ocorreu um erro ao criar o arquivo " + filename + ".yml");
+      }
+    } else {
+      load();
+      save();
     }
 
 
-    public static ConfigurationBuilder find(String name) {
-        return configs.get(name.toLowerCase());
+    configs.put(filename, this);
+  }
+
+  public void load() {
+
+    yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+  }
+
+
+  public void loadByResource() {
+    try {
+      yamlConfiguration.load(getPlugin().getResource(yamlConfiguration.getName() + ".yml"));
+    } catch (IOException | InvalidConfigurationException ignored) { }
+  }
+
+  public YamlConfiguration get() {
+    return yamlConfiguration;
+  }
+
+
+  public static ConfigurationBuilder find(String name) {
+    return configs.get(name.toLowerCase());
+  }
+
+  public JavaPlugin getPlugin() {
+    return plugin;
+  }
+
+  public void save() {
+    try {
+      get().save(file);
+
+    } catch (IOException ignored) {
     }
 
-    public JavaPlugin getPlugin() {
-        return plugin;
-    }
 
-    public void save() {
-        try {
-            get().save(file);
-
-        } catch (IOException ignored) {
-        }
-
-
-    }
+  }
 
 
 }

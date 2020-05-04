@@ -2,8 +2,7 @@ package com.uzm.hylex.core.api;
 
 import com.google.common.collect.ImmutableList;
 import com.uzm.hylex.core.Core;
-import com.uzm.hylex.core.api.container.AbstractContainer;
-import com.uzm.hylex.core.api.container.DataContainer;
+import com.uzm.hylex.core.api.container.*;
 import com.uzm.hylex.core.api.events.HylexPlayerLoadEvent;
 import com.uzm.hylex.core.api.interfaces.IArena;
 import com.uzm.hylex.core.api.interfaces.IArenaPlayer;
@@ -92,7 +91,18 @@ public class HylexPlayer {
     this.schemas.forEach((key, value) -> {
       JSONObject object = new JSONObject();
       JSONObject data = new JSONObject();
-      value.forEach((key2, value2) -> data.put(key2, value2.get()));
+      value.forEach((key2, value2) -> {
+        Object o = value2.get();
+        if (o instanceof String) {
+          if (((String) o).startsWith("{")) {
+            o = value2.getAsJsonObject();
+          } else if ((((String) o).startsWith("["))) {
+            o = value2.getAsJsonArray();
+          }
+        }
+
+        data.put(key2, o);
+      });
 
       object.put("schemaName", key);
       object.put("data", data);
@@ -161,13 +171,13 @@ public class HylexPlayer {
     this.player.setHealth(20.0);
     this.player.setFoodLevel(20);
     this.player.setGameMode(GameMode.ADVENTURE);
-    this.player.getActivePotionEffects().clear();
+    this.player.getActivePotionEffects().forEach(effect -> this.player.removePotionEffect(effect.getType()));
 
     this.player.closeInventory();
     this.player.getInventory().clear();
     this.player.getInventory().setArmorContents(new ItemStack[4]);
 
-    if (!this.player.hasPermission("hylex.fly")) {
+    if (this.player.hasPermission("hylex.fly")) {
       this.player.setAllowFlight(true);
       this.player.setFlying(true);
     }
@@ -188,6 +198,18 @@ public class HylexPlayer {
 
   public <T extends AbstractContainer> T getAbstractContainer(String schema, String key, Class<T> containerClass) {
     return this.getDataContainer(schema, key).getContainer(containerClass);
+  }
+
+  public BedWarsPreferencesContainer getBedWarsPreferences() {
+    return this.getAbstractContainer("BedWarsData", "preferences", BedWarsPreferencesContainer.class);
+  }
+
+  public BedWarsStatisticsContainer getBedWarsStatistics() {
+    return this.getAbstractContainer("BedWarsData", "statistics", BedWarsStatisticsContainer.class);
+  }
+
+  public LobbiesContainer getLobbiesContainer() {
+    return this.getAbstractContainer("Global_Profile", "lobbys", LobbiesContainer.class);
   }
 
   public String getName() {

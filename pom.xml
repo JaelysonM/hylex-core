@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uzm</groupId>
     <artifactId>hylex-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.6</version>
 
     <description>Compiled of utilities (Core) plugin for Hylex Inc.</description>
     <packaging>jar</packaging>

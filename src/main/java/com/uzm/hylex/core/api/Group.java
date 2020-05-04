@@ -23,12 +23,8 @@ public enum Group {
   private boolean alwaysVisible;
 
   Group(String name, String display, String permission, String order, boolean visible) {
-    this.display = display;
-    this.order = order;
-    this.permission = permission;
-    this.name = name;
+    this(name, display, permission, order);
     this.alwaysVisible = visible;
-    this.color = this.name.substring(0, 2);
   }
 
   Group(String name, String display, String permission, String order) {
@@ -36,7 +32,7 @@ public enum Group {
     this.order = order;
     this.permission = permission;
     this.name = name;
-    this.alwaysVisible = false;
+    this.color = this.name.substring(0, 2);
   }
 
   public String getColor() {

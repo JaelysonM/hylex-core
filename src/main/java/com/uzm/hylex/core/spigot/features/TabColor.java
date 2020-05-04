@@ -9,24 +9,24 @@ public class TabColor {
 
     private Player player;
 
-    private String footer;
+    private String header;
     private String bottom;
 
 
     public TabColor(Player player) {
         this.player=player;
         this.bottom= "";
-        this.footer="";
+        this.header="";
     }
-    public TabColor(Player player, String footer, String bottom) {
+    public TabColor(Player player, String header, String bottom) {
         this.player=player;
-        this.footer=footer;
+        this.header=header;
         this.bottom=bottom;
 
     }
 
-    public TabColor setFooter(String footer) {
-       this.footer=footer;
+    public TabColor setHeader(String header) {
+       this.header=header;
        return this;
     }
     public TabColor setBottom(String bottom) {
@@ -36,12 +36,19 @@ public class TabColor {
 
 
     public TabColor send() {
-        NMS.sendTabColor(player, footer,bottom);
+        NMS.sendTabColor(player, header,bottom);
+        destroy();
         return this;
     }
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void destroy() {
+        this.bottom=null;
+        this.header=null;
+        this.player=null;
     }
 
 }
