@@ -3,3 +3,11 @@ name: ${project.artifactId}
 version: ${project.version}
 
 main: ${main-bukkit}
+commands:
+  tp:
+  tpall:
+  gamemode:
+    aliases: [gm]
+  fly:
+    aliases: [voar]
+  speed:

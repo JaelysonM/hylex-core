@@ -98,7 +98,7 @@ public class NMSv1_8_R3 implements INMS {
   @Override
   public void sendActionBar(Player player, String message) {
     IChatBaseComponent cbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
-    PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, (byte) 3);
+    PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, (byte) 2);
     ((CraftPlayer) player).getHandle().playerConnection.sendPacket(ppoc);
   }
 

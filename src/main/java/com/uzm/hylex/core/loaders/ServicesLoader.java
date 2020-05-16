@@ -2,7 +2,7 @@ package com.uzm.hylex.core.loaders;
 
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.api.HylexPlayer;
-import com.uzm.hylex.core.java.util.ConfigurationCreator;
+import com.uzm.hylex.core.java.util.configuration.ConfigurationCreator;
 import com.uzm.hylex.services.lan.WebSocket;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;

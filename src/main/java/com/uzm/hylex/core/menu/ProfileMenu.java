@@ -6,8 +6,9 @@ import com.uzm.hylex.core.api.HylexPlayer;
 import com.uzm.hylex.core.api.container.BedWarsStatisticsContainer;
 import com.uzm.hylex.core.spigot.inventories.PlayerMenu;
 import com.uzm.hylex.core.spigot.items.ItemBuilder;
-import com.uzm.hylex.core.utils.BukkitUtils;
-import com.uzm.hylex.core.utils.StringUtils;
+import com.uzm.hylex.core.spigot.utils.BukkitUtils;
+import com.uzm.hylex.core.java.util.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -35,9 +36,10 @@ public class ProfileMenu extends PlayerMenu {
     this.setItem(10, BukkitUtils
       .putProfileOnSkull(this.player, new ItemBuilder("SKULL_ITEM:3 : 1 : display=" + Group.getColored(this.player) + " : lore=&fGrupo: " + hp.getGroup().getName()).build()));
 
+    this.setItem(12, new ItemBuilder(Material.BARRIER).name("§cPerfil do BedWars indisponível").lore("","§7As estatísticas apenas aparecerão §7na versão final,","§7junto a um relatório de estatísticas.").build());
     BedWarsStatisticsContainer statistics = hp.getBedWarsStatistics();
     long wins = statistics.getLong("wins", "global");
-    this.setItem(12, new ItemBuilder(
+   /* this.setItem(12, new ItemBuilder(
       "BED : 1 : display=&aBed Wars : lore=&fPartidas: &7" + StringUtils.formatNumber(statistics.getLong("games", "global")) + "\n \n&fCamas Destruídas: &7" + StringUtils
         .formatNumber(statistics.getLong("bedsBroken", "global")) + "\n&fCamas Perdidas: &7" + StringUtils
         .formatNumber(statistics.getLong("bedsLost", "global")) + "\n \n&fAbates: &7" + StringUtils
@@ -46,7 +48,7 @@ public class ProfileMenu extends PlayerMenu {
         .formatNumber(statistics.getLong("finalKills", "global")) + "\n&fMortes Finais: &7" + StringUtils
         .formatNumber(statistics.getLong("finalDeaths", "global")) + "\n \n&fVitórias: &7" + StringUtils.formatNumber(wins) + "\n&fDerrotas: &7" + StringUtils
         .formatNumber(statistics.getLong("games", "global") - wins) + "\n \n&fCoins: &6" + StringUtils.formatNumber(statistics.getLong("coins", "global"))).build());
-
+*/
     this.register(Core.getInstance());
     this.open();
   }

@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.utils;
+package com.uzm.hylex.core.java.util;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -90,6 +90,11 @@ public class StringUtils {
     return textToDeFormat;
   }
 
+  public static String removeNumbers(String string) {
+    return string.replaceAll("[0-9]", "");
+  }
+
+
   /**
    * Formata os {@link altColorChar} para o color code {@code §}.
    *
@@ -97,6 +102,9 @@ public class StringUtils {
    * @param textToTranslate A string para formatar as cores.
    * @return A string com as cores formatadas.
    */
+
+
+
   public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
     Pattern pattern = Pattern.compile("(?i)(" + String.valueOf(altColorChar) + ")[0-9A-FK-OR]");
 

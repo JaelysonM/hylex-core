@@ -120,7 +120,7 @@ public class UpdatablePageablePlayerInventory implements Listener {
                 inventoryContent[availableSlots[index]] = newContent[in];
             }
             index++;
-            if (index == availableSlots[availableSlots.length - 1] || (in + 1) == newContent.length) {
+            if (index == availableSlots.length || (in + 1) == newContent.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);

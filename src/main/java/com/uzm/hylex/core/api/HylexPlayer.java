@@ -1,6 +1,7 @@
 package com.uzm.hylex.core.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.api.container.*;
 import com.uzm.hylex.core.api.events.HylexPlayerLoadEvent;
@@ -168,7 +169,11 @@ public class HylexPlayer {
     this.player.setLevel(0);
     this.player.setExp(0.0F);
     this.player.setExhaustion(0.0F);
-    this.player.setHealth(20.0);
+    this.player.resetMaxHealth();
+    this.player.setHealthScaled(true);
+    this.player.setHealthScale(20.0D);
+    this.player.setHealth(20.0D);
+    this.player.setMaxHealth(20.0D);
     this.player.setFoodLevel(20);
     this.player.setGameMode(GameMode.ADVENTURE);
     this.player.getActivePotionEffects().forEach(effect -> this.player.removePotionEffect(effect.getType()));

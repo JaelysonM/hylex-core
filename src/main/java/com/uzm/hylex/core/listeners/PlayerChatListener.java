@@ -8,15 +8,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.help.HelpTopic;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerChatListener implements Listener {
+
   private static Map<UUID, Long> COOLDOWN;
   private static String[] TO_DISABLE;
 
   static {
     COOLDOWN = Maps.newHashMap();
-    TO_DISABLE = new String[]{"me", "whisper", "msg", "w", "pl", "plugins", "ver", "say"};
+    TO_DISABLE = new String[] {"me", "whisper", "msg", "w", "pl", "plugins", "ver", "say"};
   }
 
   @EventHandler
@@ -33,7 +37,7 @@ public class PlayerChatListener implements Listener {
       }
       COOLDOWN.remove(player.getUniqueId());
     }
-    COOLDOWN.computeIfAbsent(player.getUniqueId(), result -> defaultTime);
+    COOLDOWN.putIfAbsent(player.getUniqueId(), defaultTime);
     if (!evt.isCancelled()) {
       String cmd = evt.getMessage().split(" ")[0];
 

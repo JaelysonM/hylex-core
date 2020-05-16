@@ -7,7 +7,8 @@ public class Enums {
     STARTING("Iniciando"),
     PREPARE("Preparando para iniciar"),
     IN_GAME("Em jogo"),
-    END("Fim de partida");
+    END("Fim de partida"),
+    IDLE("Partida inativa");;
 
     public String name;
 

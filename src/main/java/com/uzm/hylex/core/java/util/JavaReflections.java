@@ -7,11 +7,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -59,8 +59,70 @@ public class JavaReflections
         }
         return classes;
     }
+    private static Field getField(Class<?> clazz, String fname) throws Exception {
+        Field f;
+        try {
+            f = clazz.getDeclaredField(fname);
+        } catch (Exception e) {
+            f = clazz.getField(fname);
+        }
+        setFieldAccessible(f);
+        return f;
+    }
+    public static Object getObject(Class<?> clazz, Object obj, String fname) throws Exception {
+        return getField(clazz, fname).get(obj);
+    }
 
+    public static Object getObject(Object obj, String fname) throws Exception {
+        return getField(obj.getClass(), fname).get(obj);
+    }
 
+    public static Object invokeConstructor(Class<?> clazz, Class<?>[] args, Object... initargs) throws Exception {
+        return getConstructor(clazz, args).newInstance(initargs);
+    }
+
+    private static Constructor<?> getConstructor(Class<?> clazz, Class<?>... args) throws Exception {
+        Constructor<?> c = clazz.getConstructor(args);
+        c.setAccessible(true);
+        return c;
+    }
+
+    public static Object invokeMethod(Class<?> clazz, Object obj, String method) throws Exception {
+        return Objects.requireNonNull(getMethod(clazz, method)).invoke(obj);
+    }
+
+    public static Object invokeMethod(Class<?> clazz, Object obj, String method, Class<?>[] args, Object... initargs)
+      throws Exception {
+        return Objects.requireNonNull(getMethod(clazz, method, args)).invoke(obj, initargs);
+    }
+
+    public static Object invokeMethod(Class<?> clazz, Object obj, String method, Object... initargs) throws Exception {
+        return Objects.requireNonNull(getMethod(clazz, method)).invoke(obj, initargs);
+    }
+
+    public static Object invokeMethod(Object obj, String method) throws Exception {
+        return Objects.requireNonNull(getMethod(obj.getClass(), method)).invoke(obj);
+    }
+
+    public static Object invokeMethod(Object obj, String method, Object[] initargs) throws Exception {
+        return Objects.requireNonNull(getMethod(obj.getClass(), method)).invoke(obj, initargs);
+    }
+
+    private static void setFieldAccessible(Field f) throws Exception {
+
+        f.setAccessible(true);
+        Field modifiers = Field.class.getDeclaredField("modifiers");
+        modifiers.setAccessible(true);
+        modifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+    }
+
+    public static void setObject(Class<?> clazz, Object obj, String fname, Object value) throws Exception {
+        getField(clazz, fname).set(obj, value);
+    }
+
+    public static void setObject(Object obj, String fname, Object value) throws Exception {
+        getField(obj.getClass(), fname).set(obj, value);
+    }
 
     public enum DataType
     {

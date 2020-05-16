@@ -157,8 +157,12 @@ public class SkinPacketTracker {
     inProgress.put(player.getUniqueId(), entry);
 
     if (entity.getNPC().data().get(NPC.PROFILE_NPC_SKIN, false)) {
-      Skin.fromPlayer(player).apply(entity);
-    }else {
+      Skin skin = Skin.fromPlayer(player);
+      if (skin.getSignature() != null && skin.getValue() != null) {
+        Skin.fromPlayer(player).apply(entity);
+      }
+
+    } else {
       if (entity.getSkin() != null) {
         entity.getSkin().apply(entity);
       }
@@ -190,6 +194,7 @@ public class SkinPacketTracker {
     }
   }
 
+
   private static class PlayerListener implements Listener {
 
     @EventHandler
@@ -197,6 +202,7 @@ public class SkinPacketTracker {
       TAB_LIST_REMOVER.cancelPackets(event.getPlayer());
     }
   }
+
 
   private static final Location CACHE_LOCATION = new Location(null, 0, 0, 0);
   private static PlayerListener LISTENER;

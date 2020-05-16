@@ -27,8 +27,7 @@ public class TagController {
 
   public void update() {
     if (this.team == null) {
-      Team team = getTeam(this.player.getScoreboard(),
-        order + (this.player.getUniqueId().toString().length() > 15 ? this.player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString()));
+      Team team = getTeam(this.player.getScoreboard(), this.order);
       team.setPrefix(prefix);
       team.setSuffix(suffix);
       team.addPlayer(player);
@@ -36,11 +35,12 @@ public class TagController {
       return;
     }
 
-    if (!this.team.getName().equalsIgnoreCase(
-      this.order + (this.player.getUniqueId().toString().length() > 15 ? player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString()))) {
-      this.team.unregister();
-      setTeam(getTeam(this.player.getScoreboard(),
-        order + (this.player.getUniqueId().toString().length() > 15 ? this.player.getUniqueId().toString().substring(0, 15) : this.player.getUniqueId().toString())));
+    if (!this.team.getName().equalsIgnoreCase(this.order)) {
+      if (!team.getName().contains("mini")) {
+        this.team.removePlayer(player);
+      }
+
+      setTeam(getTeam(this.player.getScoreboard(), this.order));
     }
 
     this.team.setPrefix(prefix);

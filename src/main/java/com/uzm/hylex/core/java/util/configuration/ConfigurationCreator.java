@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.java.util;
+package com.uzm.hylex.core.java.util.configuration;
 
 import com.google.common.collect.Maps;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -52,6 +52,7 @@ public class ConfigurationCreator {
 
     public void loadByResource() {
         try {
+            if (getPlugin().getResource(yamlConfiguration.getName()) !=null)
             yamlConfiguration.load(  getPlugin().getResource(yamlConfiguration.getName() + ".yml"));
         } catch (IOException | InvalidConfigurationException ignored) {  }
      }

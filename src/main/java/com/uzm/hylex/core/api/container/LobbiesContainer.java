@@ -36,4 +36,8 @@ public class LobbiesContainer extends AbstractContainer {
   public boolean isPlayersVisible() {
     return (boolean) ((JSONObject) this.lobbies.get("preferences")).get("players");
   }
+
+  public boolean isCanSendTell() {
+    return (boolean) ((JSONObject) this.lobbies.get("preferences")).get("tell");
+  }
 }

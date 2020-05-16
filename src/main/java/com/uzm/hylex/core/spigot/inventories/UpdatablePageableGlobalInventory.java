@@ -79,7 +79,7 @@ public class UpdatablePageableGlobalInventory implements Listener {
                 inventoryContent[availableSlots[index]] = content[in];
             }
             index++;
-            if (index ==  availableSlots[availableSlots.length-1] || (in + 1) == content.length) {
+            if (index == (availableSlots.length - 1) || (in + 1) == content.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);
@@ -114,7 +114,7 @@ public class UpdatablePageableGlobalInventory implements Listener {
                 inventoryContent[availableSlots[index]] = newContent[in];
             }
             index++;
-            if (index ==  availableSlots[availableSlots.length-1] || (in + 1) == newContent.length) {
+            if (index == (availableSlots.length - 1) || (in + 1) == newContent.length) {
                 Inventory inv = Bukkit.createInventory(null, inventoryContent.length,
                         title.replace("{c}", (this.pages.size() + 1) + "").replace("{m}", totalPages + ""));
                 inv.setContents(inventoryContent);

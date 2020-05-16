@@ -4,13 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uzm</groupId>
     <artifactId>hylex-core</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.0</version>
 
     <description>Compiled of utilities (Core) plugin for Hylex Inc.</description>
     <packaging>jar</packaging>
 
     <properties>
         <main-bukkit>com.uzm.hylex.core.Core</main-bukkit>
+        <main-bungee>com.uzm.hylex.core.bungee.Bungee</main-bungee>
         <protocollib.version>4.5.0</protocollib.version>
 
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -61,6 +62,13 @@
             <scope>system</scope>
             <systemPath>D:/dev/maven-builds/hylex-services-1.0.1.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>net.md_5</groupId>
+            <artifactId>bungeecord</artifactId>
+            <version>latest</version>
+            <scope>system</scope>
+            <systemPath>D:/dev/jars/BungeeCord.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
@@ -83,7 +91,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputFile>D:\dev\maven-builds\${project.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>D:\dev\maven-builds\${project.artifactId}.jar</outputFile>
                             <artifactSet>
                                 <excludes>
                                     <exclude>org.spigotmc:*</exclude>

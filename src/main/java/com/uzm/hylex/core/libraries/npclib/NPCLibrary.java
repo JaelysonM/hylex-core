@@ -65,7 +65,6 @@ public class NPCLibrary {
     for (NPC npc : listNPCS()) {
       npc.destroy();
     }
-
     HandlerList.unregisterAll(LISTENER);
     plugin = null;
     npcs = null;

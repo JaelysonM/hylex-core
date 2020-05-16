@@ -5,15 +5,19 @@ import org.bukkit.entity.Player;
 public enum Group {
 
   HYLEX("§bHylex", "§b[Hylex] ", "*", "a", true),
-  GERENTE("§4Gerente", "§4[Gerente] ", "hylex.group.gerente", "b", true),
-  ADMIN("§9Admin", "§9[Admin] ", "hylex.group.admin", "c", true),
-  DESENVOLVEDOR("§6Desenvolvedor", "§6[Desenvolvedor] ", "hylex.group.dev", "d", true),
-  MODERADOR("§2Moderador", "§2[Moderador]", "hylex.group.mod", "e", true),
-  AJUDANTE("§eAjudante", "§e[Ajudante] ", "hylex.group.ajd", "f", true),
-  PASSE("§3Passe", "§3[Passe] ", "hylex.group.pass", "g"),
-  STREAMER("§5Streamer", "§5[Streamer] ", "hylex.group.streamer", "h", true),
-  MINIYT("§cMiniYT", "§c[MiniYT] ", "hylex.group.miniyt", "i", true),
-  NORMAL("§7Normal", "§7", "hylex.group.normal", "j");
+  DESENVOLVEDOR("§6Dev", "§6[Dev] ", "group.dev", "b", true),
+  GERENTE("§4Gerente", "§4[Gerente] ", "group.gerente", "c", true),
+  ADMIN("§9Admin", "§9[Admin] ", "group.admin", "d", true),
+  MODERADOR("§2Moderador", "§2[Moderador] ", "group.mod", "e", true),
+  AJUDANTE("§eAjudante", "§e[Ajudante] ", "group.ajd", "f", true),
+  PASSE("§3Passe", "§3[Passe] ", "group.pass", "g"),
+  STREAMER("§5Streamer", "§5[Streamer] ", "streamer", "h", true),
+  YOUTUBER("§cYoutuber", "§c[Youtuber] ", "group.youtuber", "i", true),
+  MINIYT("§cMiniYT", "§c[MiniYT] ", "group.miniyt", "j", true),
+  EMERALD("§aEmerald", "§a[Emerald] ", "group.emerald", "k"),
+  DIAMOND("§bDiamond", "§b[Diamond] ", "group.diamond", "l"),
+  GOLD("§eGold", "§e[Gold] ", "group.gold", "m"),
+  NORMAL("§7Normal", "§7", "group.normal", "n");
 
   private String color;
   private String display;

@@ -24,6 +24,9 @@ public class CubeId {
     this.ymin = Math.min(l1.getBlockY(), l2.getBlockY());
     this.zmax = Math.max(l1.getBlockZ(), l2.getBlockZ());
     this.zmin = Math.min(l1.getBlockZ(), l2.getBlockZ());
+
+    this.location1 = new Location(l1.getWorld(), xmax, ymax, zmax);
+    this.location2 = new Location(l1.getWorld(), xmin, ymin, zmin);
   }
 
   public CubeId(String serializedCube) {
@@ -35,6 +38,9 @@ public class CubeId {
     this.ymin = parseInt(split[4]);
     this.zmax = parseInt(split[5]);
     this.zmin = parseInt(split[6]);
+
+    this.location1 = new Location(Bukkit.getWorld( split[0]), xmax, ymax, zmax);
+    this.location2 = new Location(Bukkit.getWorld( split[0]), xmin, ymin, zmin);
   }
 
   public Location getLocation1() {

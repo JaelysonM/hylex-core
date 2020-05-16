@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.java.util;
+package com.uzm.hylex.core.java.util.file;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -37,7 +37,7 @@ public class FilesSize {
   public String getSizeFormat() {
     String format = this.sizeFormat;
     destroy();
-    return sizeFormat;
+    return format;
   }
 
 }

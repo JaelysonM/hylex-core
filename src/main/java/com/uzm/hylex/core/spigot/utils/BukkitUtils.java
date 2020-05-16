@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.utils;
+package com.uzm.hylex.core.spigot.utils;
 
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.mojang.authlib.GameProfile;

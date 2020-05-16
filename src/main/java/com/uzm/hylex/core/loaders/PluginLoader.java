@@ -1,22 +1,26 @@
 package com.uzm.hylex.core.loaders;
 
+import com.google.common.collect.Maps;
 import com.uzm.hylex.core.Core;
-import com.uzm.hylex.core.java.util.ConfigurationCreator;
+import com.uzm.hylex.core.java.util.configuration.ConfigurationCreator;
+import com.uzm.hylex.core.java.util.JavaReflections;
 import com.uzm.hylex.core.libraries.holograms.HologramLibrary;
 import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
-import com.uzm.hylex.core.nms.interfaces.INMS;
 import com.uzm.hylex.core.nms.NMS;
 import com.uzm.hylex.core.spigot.enums.MinecraftVersion;
-import com.uzm.hylex.core.spigot.items.ItemBuilder;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.command.CommandExecutor;
 
-import java.util.UUID;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class PluginLoader {
 
   private Core core;
   private MinecraftVersion version;
+  public HashMap<String, String> permissions = Maps.newHashMap();
 
   public PluginLoader(Core core) {
     this.core = core;
@@ -32,6 +36,8 @@ public class PluginLoader {
     HologramLibrary.setupHolograms(Core.getInstance());
     loadFiles();
     new ServicesLoader(this);
+    registerCommandsPermission();
+    registerCommands();
   }
 
   public Core getCore() {
@@ -44,5 +50,37 @@ public class PluginLoader {
 
   public MinecraftVersion getSpigotVersion() {
     return this.version;
+  }
+
+  public void registerCommands() {
+    long registered = 0;
+    List<Class<?>> classes = JavaReflections.getClasses("com.uzm.hylex.core.essentials.commands", Core.getInstance());
+
+    try {
+      for (Class<?> c : classes) {
+        Method handshake = JavaReflections.getMethod(c, "getInvoke");
+        ArrayList<String> list = (ArrayList<String>) handshake.invoke(null);
+        for (String r : list) {
+          getCore().getCommand(r).setExecutor((CommandExecutor) c.newInstance());
+        }
+        registered++;
+      }
+    } catch (Exception ex) {
+      System.err.println("Probally An error occurred while trying to register some commands.");
+      ex.printStackTrace();
+    }
+
+    Bukkit.getConsoleSender().sendMessage("§b[Hylex - Core] §7We're registered §f(" + registered + "/" + classes.size() + ") §7commands.");
+  }
+
+  public void registerCommandsPermission() {
+    permissions.put("tp", "hylex.teleport");
+    permissions.put("tpall", "hylex.tpall");
+    permissions.put("gamemode", "hylex.gamemode");
+    permissions.put("gm", "hylex.gamemode");
+
+    permissions.put("fly", "hylex.gamemode");
+    permissions.put("voar", "hylex.voar");
+    permissions.put("speed", "hylex.speed");
   }
 }
