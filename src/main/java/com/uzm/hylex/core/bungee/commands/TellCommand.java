@@ -51,13 +51,17 @@ public class TellCommand extends Command {
           return;
         }
 
-        if (!hp.getLobbiesContainer().isCanSendTell()) {
+        if (!hp.getLobbiesContainer().canSendTell()) {
           sender.sendMessage(TextComponent.fromLegacyText("§cVocê desativou as mensagens privadas."));
           return;
         }
 
         String text = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         ProxiedPlayer target = Bungee.getInstance().getProxy().getPlayer(args[0]);
+        if (target == player) {
+          sender.sendMessage(TextComponent.fromLegacyText("§cVocê não pode enviar mensagens privadas para você mesmo."));
+          break;
+        }
         if (target == null) {
           sender.sendMessage(TextComponent.fromLegacyText("§cUsuário não encontrado."));
           break;
@@ -67,7 +71,6 @@ public class TellCommand extends Command {
         Group tgroup = Group.getPlayerGroup(target);
         sender.sendMessage(TextComponent.fromLegacyText("§8Mensagem para " + tgroup.getDisplay() + target.getName() + "§7: " + text));
         target.sendMessage(TextComponent.fromLegacyText("§8Mensagem de " + group.getDisplay() + sender.getName() + "§7: " + text));
-        hp.setLastMessager(target, 100);
         break;
     }
   }

@@ -4,6 +4,8 @@ import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.spigot.features.Titles;
+import net.minecraft.server.v1_8_R3.EntityLiving;
+import net.minecraft.server.v1_8_R3.NavigationAbstract;
 import net.minecraft.server.v1_8_R3.Packet;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -67,13 +69,27 @@ public interface INMS {
 
     void refreshNPCSlot(Entity entity, int slot , ItemStack stack);
 
+    void look(org.bukkit.entity.Entity entity, float yaw, float pitch);
+
     boolean isHologramEntity(Entity entity);
+
+    boolean isNavigationFinished(Object navigation);
+
 
     Hologram getHologram(Entity entity);
 
     IArmorStand createArmorStand(Location location, String name, HologramLine line);
 
     String[]getPlayerTextures(Player player);
+
+    void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate);
+
+    void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to);
+
+    void updateNavigation(Object navigation);
+
+    void updateAI(Object entity);
+
 
 
 

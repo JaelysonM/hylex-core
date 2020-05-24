@@ -38,284 +38,284 @@ import java.util.UUID;
  */
 public class AbstractNPC implements NPC {
 
-    private UUID uuid;
-    private String name;
-    private EntityController controller;
+  private UUID uuid;
+  private String name;
+  private EntityController controller;
 
-    private MetadataStore data;
-    private Map<Class<? extends NPCTrait>, NPCTrait> traits;
+  private MetadataStore data;
+  private Map<Class<? extends NPCTrait>, NPCTrait> traits;
 
-    public boolean teamRegistred;
+  public boolean teamRegistred;
 
-    public AbstractNPC(UUID uuid, String name, EntityController controller) {
-        this.uuid = uuid;
-        this.name = name;
-        this.controller = controller;
+  public AbstractNPC(UUID uuid, String name, EntityController controller) {
+    this.uuid = uuid;
+    this.name = name;
+    this.controller = controller;
 
-        this.data = new SimpleMetadataStore();
-        this.traits = new HashMap<>();
-        addTrait(CurrentLocation.class);
+    this.data = new SimpleMetadataStore();
+    this.traits = new HashMap<>();
+    addTrait(CurrentLocation.class);
+  }
+
+  @Override
+  public boolean spawn(Location location) {
+    Preconditions.checkNotNull(location, "A localizacao nao pode ser null!");
+    Preconditions.checkState(!isSpawned(), "O npc ja esta spawnado!");
+    controller.spawn(location, this);
+
+    boolean couldSpawn = MathUtils.isLoaded(location) && NMS.addToWorld(location.getWorld(), controller.getBukkitEntity(), SpawnReason.CUSTOM);
+    if (couldSpawn) {
+      SkinnableEntity entity = NMS.getSkinnable(getEntity());
+      if (entity != null) {
+        entity.getSkinTracker().onSpawnNPC();
+      }
     }
 
-    @Override
-    public boolean spawn(Location location) {
-        Preconditions.checkNotNull(location, "A localizacao nao pode ser null!");
-        Preconditions.checkState(!isSpawned(), "O npc ja esta spawnado!");
-        controller.spawn(location, this);
-
-        boolean couldSpawn = MathUtils.isLoaded(location) && NMS.addToWorld(location.getWorld(), controller.getBukkitEntity(), SpawnReason.CUSTOM);
-        if (couldSpawn) {
-            SkinnableEntity entity = NMS.getSkinnable(getEntity());
-            if (entity != null) {
-                entity.getSkinTracker().onSpawnNPC();
-            }
-        }
-
-        getTrait(CurrentLocation.class).setLocation(location);
-        if (!couldSpawn) {
-            Bukkit.getPluginManager().callEvent(new NPCNeedsRespawnEvent(this));
-            controller.remove();
-            return false;
-        }
-
-        NPCSpawnEvent event = new NPCSpawnEvent(this);
-        if (event.isCancelled()) {
-            controller.remove();
-            return false;
-        }
-
-        NMS.setHeadYaw(getEntity(), location.getYaw());
-        getEntity().setMetadata("NPC", new FixedMetadataValue(NPCLibrary.getPlugin(), this));
-
-        for (NPCTrait trait : traits.values()) {
-            trait.onSpawn();
-        }
-
-        if (getEntity() instanceof LivingEntity) {
-            LivingEntity entity = (LivingEntity) getEntity();
-            entity.setRemoveWhenFarAway(false);
-
-            if (NMS.getStepHeight(entity) < 1.0f) {
-                NMS.setStepHeight(entity, 1.0f);
-            }
-
-            if (getEntity() instanceof Player) {
-                NMS.replaceTrackerEntry((Player) getEntity());
-            }
-        }
-
-        getTrait(CurrentLocation.class).setLocation(getEntity().getLocation());
-
-        return true;
+    getTrait(CurrentLocation.class).setLocation(location);
+    if (!couldSpawn) {
+      Bukkit.getPluginManager().callEvent(new NPCNeedsRespawnEvent(this));
+      controller.remove();
+      return false;
     }
 
-    @Override
-    public boolean despawn() {
-        Preconditions.checkState(isSpawned(), "O npc nao esta spawnado!");
-        NPCDespawnEvent event = new NPCDespawnEvent(this);
-        Bukkit.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
+    NPCSpawnEvent event = new NPCSpawnEvent(this);
+    if (event.isCancelled()) {
+      controller.remove();
+      return false;
+    }
 
-        for (NPCTrait trait : traits.values()) {
-            trait.onDespawn();
-        }
+    NMS.setHeadYaw(getEntity(), location.getYaw());
+    getEntity().setMetadata("NPC", new FixedMetadataValue(NPCLibrary.getPlugin(), this));
 
-        this.controller.remove();
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            Scoreboard sb = player.getScoreboard();
+    for (NPCTrait trait : traits.values()) {
+      trait.onSpawn();
+    }
+
+    if (getEntity() instanceof LivingEntity) {
+      LivingEntity entity = (LivingEntity) getEntity();
+      entity.setRemoveWhenFarAway(false);
+
+      if (NMS.getStepHeight(entity) < 1.0f) {
+        NMS.setStepHeight(entity, 1.0f);
+      }
+
+      if (getEntity() instanceof Player) {
+        NMS.replaceTrackerEntry((Player) getEntity());
+      }
+    }
+
+    getTrait(CurrentLocation.class).setLocation(getEntity().getLocation());
+
+    return true;
+  }
+
+  @Override
+  public boolean despawn() {
+    Preconditions.checkState(isSpawned(), "O npc nao esta spawnado!");
+    NPCDespawnEvent event = new NPCDespawnEvent(this);
+    Bukkit.getServer().getPluginManager().callEvent(event);
+    if (event.isCancelled()) {
+      return false;
+    }
+
+    for (NPCTrait trait : traits.values()) {
+      trait.onDespawn();
+    }
+
+    this.controller.remove();
+    Bukkit.getOnlinePlayers().forEach(player -> {
+      Scoreboard sb = player.getScoreboard();
+      Team team = sb.getTeam("mNPCS");
+      if (team != null) {
+        team.removeEntry(this.name);
+        if (team.getSize() == 0) {
+          team.unregister();
+        }
+      }
+    });
+    return true;
+  }
+
+  @Override
+  public void destroy() {
+    if (isSpawned()) {
+      despawn();
+    }
+
+    Bukkit.getOnlinePlayers().forEach(player -> {
+      Scoreboard sb = player.getScoreboard();
+      Team team = sb.getTeam("mNPCS");
+      if (team != null) {
+        team.removeEntry(this.name);
+        if (team.getSize() == 0) {
+          team.unregister();
+        }
+      }
+    });
+    this.uuid = null;
+    this.name = null;
+    this.controller = null;
+    this.traits.clear();
+    this.traits = null;
+    NPCLibrary.unregister(this);
+  }
+
+  @Override
+  public MetadataStore data() {
+    return data;
+  }
+
+  private int ticksToUpdate;
+
+  @Override
+  public void update() {
+    if (isSpawned()) {
+
+      if (ticksToUpdate++ > 30) {
+        ticksToUpdate = 0;
+
+        Entity entity = controller.getBukkitEntity();
+        if (entity instanceof Player) {
+          for (Player players : Bukkit.getServer().getOnlinePlayers()) {
+
+            if (!NPCLibrary.isNPC(players)) {
+              Scoreboard sb = players.getScoreboard();
+              Team team = sb.getTeam("mNPCS");
+              if (data().get(HIDE_BY_TEAMS_KEY, false)) {
+                if (team == null) {
+                  team = sb.registerNewTeam("mNPCS");
+                  team.setNameTagVisibility(NameTagVisibility.NEVER);
+                  team.setPrefix("§8[NPC] ");
+                }
+
+                if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
+                  team.addPlayer((Player) controller.getBukkitEntity());
+                  teamRegistred = true;
+                }
+
+              }
+
+              if (team != null && team.getSize() == 0) {
+                team.unregister();
+              }
+
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+
+  public void updateInstant() {
+    if (isSpawned()) {
+      Entity entity = controller.getBukkitEntity();
+      if (entity instanceof Player) {
+        for (Player players : Bukkit.getServer().getOnlinePlayers()) {
+          if (!NPCLibrary.isNPC(players)) {
+            Scoreboard sb = players.getScoreboard();
             Team team = sb.getTeam("mNPCS");
-            if (team != null) {
-                team.removeEntry(this.name);
-                if (team.getSize() == 0) {
-                    team.unregister();
-                }
-            }
-        });
-        return true;
-    }
+            if (data().get(HIDE_BY_TEAMS_KEY, false)) {
+              if (team == null) {
+                team = sb.registerNewTeam("mNPCS");
+                team.setNameTagVisibility(NameTagVisibility.NEVER);
+                team.setPrefix("§8[NPC] ");
+              }
 
-    @Override
-    public void destroy() {
-        if (isSpawned()) {
-            despawn();
-        }
+              if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
+                team.addPlayer((Player) controller.getBukkitEntity());
+              }
 
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            Scoreboard sb = player.getScoreboard();
-            Team team = sb.getTeam("mNPCS");
-            if (team != null) {
-                team.removeEntry(this.name);
-                if (team.getSize() == 0) {
-                    team.unregister();
-                }
-            }
-        });
-        this.uuid = null;
-        this.name = null;
-        this.controller = null;
-        this.traits.clear();
-        this.traits = null;
-        NPCLibrary.unregister(this);
-    }
-
-    @Override
-    public MetadataStore data() {
-        return data;
-    }
-
-    private int ticksToUpdate;
-
-    @Override
-    public void update() {
-        if (isSpawned()) {
-
-            if (ticksToUpdate++ > 30) {
-                ticksToUpdate = 0;
-
-                Entity entity = controller.getBukkitEntity();
-                if (entity instanceof Player) {
-                    for (Player players : Bukkit.getServer().getOnlinePlayers()) {
-
-                        if (!NPCLibrary.isNPC(players)) {
-                            Scoreboard sb = players.getScoreboard();
-                            Team team = sb.getTeam("mNPCS");
-                            if (data().get(HIDE_BY_TEAMS_KEY, false)) {
-                                if (team == null) {
-                                    team = sb.registerNewTeam("mNPCS");
-                                    team.setNameTagVisibility(NameTagVisibility.NEVER);
-                                    team.setPrefix("§8[NPC] ");
-                                }
-
-                                if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
-                                    team.addPlayer((Player) controller.getBukkitEntity());
-                                    teamRegistred=true;
-                                }
-
-                            }
-
-                            if (team != null && team.getSize() == 0) {
-                                team.unregister();
-                            }
-
-                        }
-                    }
-                }
+              continue;
             }
 
-        }
-
-    }
-
-    public void updateInstant() {
-        if (isSpawned()) {
-            Entity entity = controller.getBukkitEntity();
-            if (entity instanceof Player) {
-                for (Player players : Bukkit.getServer().getOnlinePlayers()) {
-                    if (!NPCLibrary.isNPC(players)) {
-                        Scoreboard sb = players.getScoreboard();
-                        Team team = sb.getTeam("mNPCS");
-                        if (data().get(HIDE_BY_TEAMS_KEY, false)) {
-                            if (team == null) {
-                                team = sb.registerNewTeam("mNPCS");
-                                team.setNameTagVisibility(NameTagVisibility.NEVER);
-                                team.setPrefix("§8[NPC] ");
-                            }
-
-                            if (!team.hasPlayer((Player) controller.getBukkitEntity())) {
-                                team.addPlayer((Player) controller.getBukkitEntity());
-                            }
-
-                            continue;
-                        }
-
-                        if (team != null && team.getSize() == 0) {
-                            team.unregister();
-                            System.out.println("UNREGISTER");
-                        }
-                    }
-                }
+            if (team != null && team.getSize() == 0) {
+              team.unregister();
+              System.out.println("UNREGISTER");
             }
-
+          }
         }
-    }
+      }
 
-    @Override
-    public void addTrait(NPCTrait trait) {
-        traits.put(trait.getClass(), trait);
-        trait.onAttach();
     }
+  }
 
-    @Override
-    public void addTrait(Class<? extends NPCTrait> traitClass) {
-        try {
-            NPCTrait trait = (NPCTrait) traitClass.getDeclaredConstructors()[0].newInstance(this);
-            traits.put(traitClass, trait);
-            trait.onAttach();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Falha ao adicionar Trait " + traitClass.getName(), e);
-        }
+  @Override
+  public void addTrait(NPCTrait trait) {
+    traits.put(trait.getClass(), trait);
+    trait.onAttach();
+  }
+
+  @Override
+  public void addTrait(Class<? extends NPCTrait> traitClass) {
+    try {
+      NPCTrait trait = (NPCTrait) traitClass.getDeclaredConstructors()[0].newInstance(this);
+      traits.put(traitClass, trait);
+      trait.onAttach();
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException("Falha ao adicionar Trait " + traitClass.getName(), e);
     }
+  }
 
-    @Override
-    public void removeTrait(Class<? extends NPCTrait> traitClass) {
-        NPCTrait trait = traits.get(traitClass);
-        if (trait != null) {
-            trait.onRemove();
-            traits.remove(traitClass);
-        }
+  @Override
+  public void removeTrait(Class<? extends NPCTrait> traitClass) {
+    NPCTrait trait = traits.get(traitClass);
+    if (trait != null) {
+      trait.onRemove();
+      traits.remove(traitClass);
     }
+  }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends NPCTrait> T getTrait(Class<T> traitClass) {
-        return (T) traits.get(traitClass);
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends NPCTrait> T getTrait(Class<T> traitClass) {
+    return (T) traits.get(traitClass);
+  }
+
+  @Override
+  public boolean isSpawned() {
+    return controller != null && controller.getBukkitEntity() != null && controller.getBukkitEntity().isValid();
+  }
+
+  @Override
+  public boolean isProtected() {
+    return data().get(PROTECTED_KEY, true);
+  }
+
+  @Override
+  public Entity getEntity() {
+    return controller.getBukkitEntity();
+  }
+
+  @Override
+  public Location getCurrentLocation() {
+    return getTrait(CurrentLocation.class).getLocation().getWorld() != null ? getTrait(CurrentLocation.class).getLocation() : isSpawned() ? getEntity().getLocation() : null;
+  }
+
+  @Override
+  public UUID getUUID() {
+    return uuid;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+
+  public void setName(String name) {
+    this.name = name;
+    if (!isSpawned())
+      return;
+    Entity bukkitEntity = getEntity();
+    if (bukkitEntity instanceof LivingEntity) {
+      ((LivingEntity) bukkitEntity).setCustomName(name);
     }
-
-    @Override
-    public boolean isSpawned() {
-        return controller != null && controller.getBukkitEntity() != null && controller.getBukkitEntity().isValid();
+    if (bukkitEntity.getType() == EntityType.PLAYER) {
+      Location old = bukkitEntity.getLocation();
+      despawn();
+      spawn(old);
     }
-
-    @Override
-    public boolean isProtected() {
-        return data().get(PROTECTED_KEY, true);
-    }
-
-    @Override
-    public Entity getEntity() {
-        return controller.getBukkitEntity();
-    }
-
-    @Override
-    public Location getCurrentLocation() {
-        return getTrait(CurrentLocation.class).getLocation().getWorld() != null ? getTrait(CurrentLocation.class).getLocation() : isSpawned() ? getEntity().getLocation() : null;
-    }
-
-    @Override
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-        if (!isSpawned())
-            return;
-        Entity bukkitEntity = getEntity();
-        if (bukkitEntity instanceof LivingEntity) {
-            ((LivingEntity) bukkitEntity).setCustomName(name);
-        }
-        if (bukkitEntity.getType() == EntityType.PLAYER) {
-            Location old = bukkitEntity.getLocation();
-            despawn();
-            spawn(old);
-        }
-    }
+  }
 }

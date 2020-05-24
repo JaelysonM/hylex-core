@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.uzm.hylex.core.bungee.Bungee;
 import com.uzm.hylex.core.bungee.api.Group;
+import com.uzm.hylex.core.bungee.api.HylexPlayer;
 import com.uzm.hylex.core.bungee.party.BungeeParty;
 import com.uzm.hylex.core.bungee.party.BungeePartyManager;
 import net.md_5.bungee.api.CommandSender;
@@ -31,9 +32,8 @@ public class PartyCommand extends Command {
 
     ProxiedPlayer player = (ProxiedPlayer) sender;
     if (args.length == 0) {
-      player.sendMessage(TextComponent.fromLegacyText(
-        " \n§3/p [mensagem] §f- §7Comunicar-se com os membros.\n§3/party aceitar [jogador] §f- §7Aceitar uma solicitação.\n§3/party ajuda §f- §7Mostrar essa mensagem de ajuda.\n§3/party convidar [jogador] §f- §7Convidar um jogador.\n§3/party deletar §f- §7Deletar a party.\n§3/party expulsar [jogador] §f- §7Expulsar um membro.\n§3/party info §f- §7Informações da sua Party.\n§3/party negar [jogador] §f- §7Negar uma solicitação.\n§3/party sair §f- §7Sair da Party.\n§3/party transferir [jogador] §f- §7Transferir a Party para outro membro.\n "));
-      return;
+     help(player);
+     return;
     }
 
     String action = args[0];
@@ -70,8 +70,7 @@ public class PartyCommand extends Command {
       party.join(player.getName());
       player.sendMessage(TextComponent.fromLegacyText(" \n§aVocê entrou na Party de " + Group.getColored(target) + "§a!\n "));
     } else if (action.equalsIgnoreCase("ajuda")) {
-      player.sendMessage(TextComponent.fromLegacyText(
-        " \n§3/p [mensagem] §f- §7Comunicar-se com os membros.\n§3/party aceitar [jogador] §f- §7Aceitar uma solicitação.\n§3/party ajuda §f- §7Mostrar essa mensagem de ajuda.\n§3/party convidar [jogador] §f- §7Convidar um jogador.\n§3/party deletar §f- §7Deletar a party.\n§3/party expulsar [jogador] §f- §7Expulsar um membro.\n§3/party info §f- §7Informações da sua Party.\n§3/party negar [jogador] §f- §7Negar uma solicitação.\n§3/party sair §f- §7Sair da Party.\n§3/party transferir [jogador] §f- §7Transferir a Party para outro membro.\n "));
+      help(player);
     } else if (action.equalsIgnoreCase("deletar")) {
       BungeeParty party = BungeePartyManager.getMemberParty(player.getName());
       if (party == null) {
@@ -99,13 +98,16 @@ public class PartyCommand extends Command {
         return;
       }
 
-      if (!Bungee.getInstance().getProxy().getPlayer(party.getLeader()).getServer().getInfo().getName().contains("mega")) {
+      if (Bungee.getInstance().getProxy().getPlayer(party.getLeader()).getServer().getInfo().getName().contains("mega")) {
         player.sendMessage(TextComponent.fromLegacyText("§cVocê não pode puxar os jogadores para esse servidor."));
         return;
       }
 
       party.broadcast(" \n" + Group.getColored(player.getName()) + " §apuxou todos os jogadores para o seu servidor!\n ", true);
-      player.sendMessage(TextComponent.fromLegacyText("§aVocê puxou todos os jogadores para o seu servidor."));
+
+      player.sendMessage(TextComponent.fromLegacyText(""));
+      player.sendMessage(TextComponent.fromLegacyText("§e* §aVocê puxou todos os jogadores para o seu servidor."));
+      player.sendMessage(TextComponent.fromLegacyText(""));
 
       ServerInfo server = Bungee.getInstance().getProxy().getPlayer(party.getLeader()).getServer().getInfo();
       if (server != null) {
@@ -114,13 +116,19 @@ public class PartyCommand extends Command {
           if (player.getServer().getInfo().getName().equals("auth")) {
             return;
           }
+          if (pp.getName().equalsIgnoreCase(party.getLeader())) {
+            return;
+          }
           ByteArrayDataOutput out = ByteStreams.newDataOutput();
           out.writeUTF("SendPartyMember");
-          out.writeUTF(player.getName());
+          out.writeUTF(p.getName());
           out.writeUTF(server.getName());
           out.writeUTF(server.getName());
-          out.writeUTF(player.getServer().getInfo() == server?"INSIDE": "OUTSIDE");
-          player.getServer().sendData("hylex-core", out.toByteArray());
+          out.writeUTF(p.getServer().getInfo() == server?"INSIDE": "OUTSIDE");
+          p.getServer().sendData("hylex-core", out.toByteArray());
+          p.sendMessage(TextComponent.fromLegacyText(""));
+          p.sendMessage(TextComponent.fromLegacyText("§e* §f" + player.getName() + " §apuxou você para o servidor dele."));
+          p.sendMessage(TextComponent.fromLegacyText(""));
         });
       }
     } else if (action.equalsIgnoreCase("expulsar")) {
@@ -275,9 +283,34 @@ public class PartyCommand extends Command {
         return;
       }
 
-      target.sendMessage(party.invite(target.getName()));
-      player.sendMessage(
-        TextComponent.fromLegacyText(" \n" + Group.getColored(action) + " §afoi convidado para a Party. Ele tem 60 segundos para aceitar ou negar esta solicitação.\n "));
+      HylexPlayer hp = HylexPlayer.getByPlayer(target);
+      if (hp!=null) {
+        if (!hp.getLobbiesContainer().canSendParty()) {
+          player.sendMessage(TextComponent.fromLegacyText("§cVocê não pode convidar esse jogador."));
+          return;
+        }
+        target.sendMessage(party.invite(target.getName()));
+        player.sendMessage(
+          TextComponent.fromLegacyText(" \n" + Group.getColored(action) + " §afoi convidado para a Party. Ele tem 60 segundos para aceitar ou negar esta solicitação.\n "));
+
+      }else {
+        player.sendMessage(TextComponent.fromLegacyText("§cVocê não pode convidar esse jogador."));
+      }
     }
+  }
+
+  public void help(ProxiedPlayer player) {
+    player.sendMessage(TextComponent.fromLegacyText(" \n   §eAjuda do comando §f'" + "party" + "'\n" +
+      "\n  §e- §f/party ajuda §7Veja todos os sub-comandos." +
+      "\n  §e- §f/p <mensagem> §7Envie uma mensagem no chat privado da sua party." +
+      "\n  §e- §f/party aceitar <jogador> §7Aceite o convite de party de um jogador." +
+      "\n  §e- §f/party negar <jogador> §7Negue o convite de party de um jogador." +
+      "\n  §e- §f/party deletar <jogador> §7Delete a party." +
+      "\n  §e- §f/party expulsar <jogador> §7Expulse um jogador da sua party." +
+      "\n  §e- §f/party sair §7Saia da sua party." +
+      "\n  §e- §f/party transferir <jogador> §7Transfira a party para outro jogador." +
+      "\n  §e- §f/party info §7Veja um resumo básico da sua party." +
+      "\n  §e- §f/party convidar §7Veja todos os sub-comandos.\n "));
+
   }
 }

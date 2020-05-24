@@ -1,18 +1,21 @@
 package com.uzm.hylex.core.bungee.commands;
 
+import com.google.common.collect.Lists;
 import com.uzm.hylex.core.bungee.api.Group;
 import com.uzm.hylex.core.bungee.api.ReportType;
-import com.uzm.hylex.core.java.util.StringUtils;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.apache.commons.lang.StringUtils;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,57 +40,50 @@ public class ReportCommand extends Command {
     ProxiedPlayer player = (ProxiedPlayer) sender;
     long current = DELAY.getOrDefault(player.getUniqueId(), 0L);
     if (current > System.currentTimeMillis()) {
-      player.sendMessage(TextComponent.fromLegacyText("§cVocê precisa aguardar " + DF.format(current / 1000) + " segundos para enviar uma nova denúncia."));
+      player.sendMessage(
+        TextComponent.fromLegacyText("§cVocê precisa aguardar " + (current- System.currentTimeMillis()) / 1000 + " segundos para enviar uma nova denúncia."));
       return;
     }
 
     DELAY.remove(player.getUniqueId());
     if (args.length == 0) {
-      player.sendMessage(TextComponent.fromLegacyText("§cUtilize /report <jogador>"));
+      player.sendMessage(TextComponent.fromLegacyText(
+        " \n   §eAjuda do comando §f'" + "report" + "'\n" +
+        "\n  §e- §f/report <jogador> §7Reporte um jogador, sem a existência de provas visuais." +
+        "\n  §e- §f/report <jogador> <prova> §7Reporte um jogador, com a existência de provas visuais, ou seja, imagens e vídeos.\n "
+        ));
       return;
     }
-
-    ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(args[0]);
-    if (pp == null) {
-      player.sendMessage(TextComponent.fromLegacyText("§cUsuário não encontrado."));
+    String regex = "(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\\s]{2,})";
+    boolean needsProof = args.length == 2;
+    ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+    if (target ==null) {
+      player.sendMessage(TextComponent.fromLegacyText("§f" + args[0] +" §cnão está online da rede."));
       return;
     }
-
-    ReportType rt = ReportType.fromName(StringUtils.join(args, 1, " "));
-    if (rt == null) {
-      player.sendMessage(ComponentSerializer.parse(ReportType.REASONS.toString().replace("{player}", args[0])));
-      return;
-    }
-
-    String proof = null;
-    if (rt.isRequiresProof()) {
-      if (args.length <= rt.getProofId()) {
-        player.sendMessage(TextComponent.fromLegacyText("§cUtilize /report " + args[0] + " " + rt.getName() + " <prova>"));
+    TextComponent textC = new TextComponent("\n       §e* §7Você irá reportar o jogador §f" + target.getName() + "" +
+      "\n §8(Escolha um motivo da categoria " + (needsProof ?"'Exige prova'": "'Não exige prova'")+")\n\n");
+    if (needsProof) {
+      if (!args[1].matches(regex)) {
+        player.sendMessage(TextComponent.fromLegacyText("§cA prova deve ser um link válido."));
         return;
       }
+      Lists.newArrayList( ReportType.values()).stream().filter(ReportType::isRequiresProof).forEach(result -> {
+        TextComponent hover = new TextComponent(" §e- §7" + result.getName() + "\n");
+        hover.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§eClique para reportar §f" + target.getName() + " §epor §f§n" + result.getName() )));
+        hover.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/sendr " + target.getName() + " " + result.toString() + " " + args[1]));
+        textC.addExtra(hover);
+      });
+    }else {
+      Lists.newArrayList( ReportType.values()).stream().filter(result -> !result.isRequiresProof()).forEach(result -> {
+        TextComponent hover = new TextComponent(" §e- §7" + result.getName() + " \n");
+        hover.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("§eClique para reportar §f" + target.getName() + " §epor §f§n" + result.getName() )));
+        hover.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/sendr " + target.getName() + " " + result.toString() ));
+        textC.addExtra(hover);
+      });
+    }
+    player.sendMessage(textC);
 
-      proof = args[rt.getProofId()];
-    }
 
-    DELAY.put(player.getUniqueId(), System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(150));
-    player.sendMessage(TextComponent.fromLegacyText("§aSua denúncia foi enviada para nossa Equipe."));
-    TextComponent report = new TextComponent("");
-    for (BaseComponent component : TextComponent
-      .fromLegacyText(" \n §b§lNOVA DENÚNCIA\n \n §aO jogador(a) " + Group.getColored(player) + " §aacusou " + Group.getColored(pp) + " §ade Cheating!")) {
-      report.addExtra(component);
-    }
-    if (proof != null) {
-      for (BaseComponent component : TextComponent.fromLegacyText("\n §aProva: §f" + proof)) {
-        report.addExtra(component);
-      }
-    }
-    for (BaseComponent component : TextComponent.fromLegacyText("\n ")) {
-      report.addExtra(component);
-    }
-    for (ProxiedPlayer players : ProxyServer.getInstance().getPlayers()) {
-      if (players.hasPermission("hylex.staff")) {
-        players.sendMessage(report);
-      }
-    }
   }
 }

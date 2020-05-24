@@ -13,11 +13,13 @@ import com.uzm.hylex.core.nms.interfaces.IArmorStand;
 import com.uzm.hylex.core.nms.interfaces.INMS;
 import com.uzm.hylex.core.nms.reflections.Accessors;
 import com.uzm.hylex.core.nms.reflections.acessors.FieldAccessor;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.entity.EntityNPCPlayer;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.entity.EntityStand;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.entity.HumanController;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.PlayerlistTrackerEntry;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.UUIDMetadataStore;
 import com.uzm.hylex.core.spigot.features.Titles;
+import com.uzm.hylex.core.utils.Utils;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,10 +41,16 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 
 public class NMSv1_8_R3 implements INMS {
   private FieldAccessor<Set> SET_TRACKERS;
+
+  private static final Location FROM_LOCATION = new Location(null, 0, 0, 0);
+  private static final Set<EntityType> BAD_CONTROLLER_LOOK = EnumSet.of(EntityType.SILVERFISH, EntityType.ENDERMITE,
+    EntityType.ENDER_DRAGON, EntityType.BAT, EntityType.SLIME, EntityType.MAGMA_CUBE, EntityType.HORSE,
+    EntityType.GHAST);
 
   public NMSv1_8_R3() {
     SET_TRACKERS = Accessors.getField(EntityTracker.class, "c", Set.class);
@@ -54,6 +62,92 @@ public class NMSv1_8_R3 implements INMS {
 
     EntityControllers.registerEntityController(EntityType.PLAYER, HumanController.class);
   }
+
+  @Override
+  public void look(org.bukkit.entity.Entity entity, float yaw, float pitch) {
+    Entity handle = getHandle(entity);
+    if (handle == null)
+      return;
+    yaw = Utils.clampYaw(yaw);
+    handle.yaw = yaw;
+    setHeadYaw(entity, yaw);
+    handle.pitch = pitch;
+  }
+
+  @Override
+  public void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate) {
+    Entity handle = getHandle(entity);
+    if (immediate || headOnly || BAD_CONTROLLER_LOOK.contains(handle.getBukkitEntity().getType()) || (!(handle instanceof EntityInsentient) && !(handle instanceof EntityNPCPlayer))) {
+      Location fromLocation = entity.getLocation(FROM_LOCATION);
+      double xDiff, yDiff, zDiff;
+      xDiff = to.getX() - fromLocation.getX();
+      yDiff = to.getY() - fromLocation.getY();
+      zDiff = to.getZ() - fromLocation.getZ();
+
+      double distanceXZ = Math.sqrt(xDiff * xDiff + zDiff * zDiff);
+      double distanceY = Math.sqrt(distanceXZ * distanceXZ + yDiff * yDiff);
+
+      double yaw = Math.toDegrees(Math.acos(xDiff / distanceXZ));
+      double pitch = Math.toDegrees(Math.acos(yDiff / distanceY)) - 90;
+      if (zDiff < 0.0)
+        yaw += Math.abs(180 - yaw) * 2;
+      if (handle instanceof EntityEnderDragon) {
+        yaw = getDragonYaw(handle, to.getX(), to.getZ());
+      } else {
+        yaw = yaw - 90;
+      }
+      if (headOnly) {
+        setHeadYaw(entity, (float) yaw);
+      } else {
+        look(entity, (float) yaw, (float) pitch);
+      }
+      return;
+    }
+    if (handle instanceof EntityInsentient) {
+      ((EntityInsentient) handle).getControllerLook().a(to.getX(), to.getY(), to.getZ(), 10, ((EntityInsentient) handle).bQ());
+      while (((EntityInsentient) handle).aK >= 180F) {
+        ((EntityInsentient) handle).aK -= 360F;
+      }
+      while (((EntityInsentient) handle).aK < -180F) {
+        ((EntityInsentient) handle).aK += 360F;
+      }
+    } else {
+      ((EntityNPCPlayer) handle).setTargetLook(to);
+    }
+  }
+
+  @Override
+  public void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to) {
+    Entity handle =getHandle(from), target = getHandle(to);
+    if (BAD_CONTROLLER_LOOK.contains(handle.getBukkitEntity().getType())) {
+      if (to instanceof LivingEntity) {
+        look(from, ((LivingEntity) to).getEyeLocation(), false, true);
+      } else {
+        look(from, to.getLocation(), false, true);
+      }
+    } else if (handle instanceof EntityInsentient) {
+      ((EntityInsentient) handle).getControllerLook().a(target, 10, ((EntityInsentient) handle).bQ());
+      while (((EntityLiving) handle).aK >= 180F) {
+        ((EntityLiving) handle).aK -= 360F;
+      }
+      while (((EntityLiving) handle).aK < -180F) {
+        ((EntityLiving) handle).aK += 360F;
+      }
+    } else if (handle instanceof EntityNPCPlayer) {
+      ((EntityNPCPlayer)handle).setTargetLook(target, 10F, 40F);
+    }
+  }
+
+  public void updateAI(Object entity) {
+      ((EntityNPCPlayer) entity).updateAI();
+
+  }
+
+  @Override
+  public void updateNavigation(Object navigation) {
+    ((NavigationAbstract)navigation).k();
+  }
+
 
   @Override
   public ItemStack glow(ItemStack stackToGlow) {
@@ -452,6 +546,12 @@ public class NMSv1_8_R3 implements INMS {
     }
   }
 
+
+  @Override
+  public boolean isNavigationFinished(Object navigation) {
+    return ((NavigationAbstract)navigation).m();
+  }
+
   @Override
   public String[] getPlayerTextures(Player player) {
     EntityPlayer playerNMS = ((CraftPlayer) player).getHandle();
@@ -461,4 +561,21 @@ public class NMSv1_8_R3 implements INMS {
     String signature = property.getSignature();
     return new String[] {texture, signature};
   }
+
+  public static Entity getHandle(org.bukkit.entity.Entity entity) {
+    if (!(entity instanceof CraftEntity))
+      return null;
+    return ((CraftEntity) entity).getHandle();
+  }
+
+  private float getDragonYaw(Entity handle, double tX, double tZ) {
+    if (handle.locZ > tZ)
+      return (float) (-Math.toDegrees(Math.atan((handle.locX - tX) / (handle.locZ - tZ))));
+    if (handle.locZ < tZ) {
+      return (float) (-Math.toDegrees(Math.atan((handle.locX - tX) / (handle.locZ - tZ)))) + 180.0F;
+    }
+    return handle.yaw;
+  }
+
+
 }

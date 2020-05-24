@@ -20,15 +20,17 @@ public class PluginMessageListener implements org.bukkit.plugin.messaging.Plugin
         String serverName = in.readUTF();
         String mini = in.readUTF();
         String type = in.readUTF();
+
         if (target != null) {
           HylexPlayer hp = HylexPlayer.getByPlayer(target);
           if (hp != null) {
             target.sendMessage("§8Sendo enviado para " +mini + "...");
             if (type.equalsIgnoreCase("OUTSIDE"))
-              ProxyUtils.connect(hp, serverName);
+              ProxyUtils.connect(hp, serverName, mini);
           }
         }
       }
+
     }
   }
 }

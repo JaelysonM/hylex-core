@@ -6,6 +6,8 @@ import org.bukkit.event.HandlerList;
 
 public class HylexPlayerLoadEvent extends Event {
 
+
+
   private HylexPlayer hylexPlayer;
 
   public HylexPlayerLoadEvent(HylexPlayer hylexPlayer) {

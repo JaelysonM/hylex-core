@@ -44,6 +44,26 @@ public class ChatListener implements Listener {
           PROTECTION_LOBBY.put(player.getName().toLowerCase(), System.currentTimeMillis() + 3000);
           player.sendMessage(TextComponent.fromLegacyText("§aVocê tem certeza? Utilize /lobby novamente para voltar ao lobby."));
         }
+        if ((command.equalsIgnoreCase("lp")
+          ||command.equalsIgnoreCase("luckperms")
+          ||command.equalsIgnoreCase("perms")
+          ||command.equalsIgnoreCase("permissions")
+          ||command.equalsIgnoreCase("perm")
+          ||command.equalsIgnoreCase("luckypermsbungee")
+          ||command.equalsIgnoreCase("bperms")
+          ||command.equalsIgnoreCase("bpermissions")
+          ||command.equalsIgnoreCase("bperm")
+          ||command.equalsIgnoreCase("lpb")
+          ||command.equalsIgnoreCase("litebans")
+          ||command.equalsIgnoreCase("antibot")
+          ||command.equalsIgnoreCase("ab")
+          ||command.equalsIgnoreCase("skin")
+          ||command.equalsIgnoreCase("sr")
+          ||command.equalsIgnoreCase("help")
+        ) && !player.hasPermission("hylex.superior")) {
+          evt.setCancelled(true);
+          player.sendMessage(TextComponent.fromLegacyText("§cO comando §n'" + command + "'§c não está acessível ou não existe."));
+        }
        else if (args.length > 2) {
           ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
 
@@ -54,11 +74,14 @@ public class ChatListener implements Listener {
             }
 
             if (blockTell && command.equals("tell") && !args[1].equalsIgnoreCase(player.getName())) {
-              if (!hp.getLobbiesContainer().isCanSendTell()) {
+              if (!hp.getLobbiesContainer().canSendTell()) {
                 evt.setCancelled(true);
                 player.sendMessage(TextComponent.fromLegacyText("§cEste usuário desativou as mensagens privadas."));
+              }else {
+                hp.setLastMessager(player, 30);
               }
             }
+
           }
         }
       }

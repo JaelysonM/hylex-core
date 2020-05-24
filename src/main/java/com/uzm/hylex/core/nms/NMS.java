@@ -21,127 +21,152 @@ import java.util.Collection;
 
 public class NMS {
 
-    private static INMS nms;
+  private static INMS nms;
 
 
-    public static boolean setupNMS(MinecraftVersion version) {
+  public static boolean setupNMS(MinecraftVersion version) {
 
-        if (version == MinecraftVersion.V1_8) {
-            nms = new NMSv1_8_R3();
-            return true;
-        }
-        return false;
+    if (version == MinecraftVersion.V1_8) {
+      nms = new NMSv1_8_R3();
+      return true;
     }
+    return false;
+  }
 
-    public static ItemStack glow(ItemStack stackToGlow) {
-        return nms.glow(stackToGlow);
-    }
+  public static ItemStack glow(ItemStack stackToGlow) {
+    return nms.glow(stackToGlow);
+  }
 
-    public static void sendTitle(Player player, Titles.TitleType type, String bottom, String top, int fadeIn, int stayTime, int fadeOut) {
-        nms.sendTitle(player, type, bottom, top, fadeIn, stayTime, fadeOut);
-    }
+  public static void sendTitle(Player player, Titles.TitleType type, String bottom, String top, int fadeIn, int stayTime, int fadeOut) {
+    nms.sendTitle(player, type, bottom, top, fadeIn, stayTime, fadeOut);
+  }
 
-    public static void sendActionBar(Player player, String message) {
-        nms.sendActionBar(player, message);
-    }
+  public static void sendActionBar(Player player, String message) {
+    nms.sendActionBar(player, message);
+  }
 
-    public static void sendTabColor(Player player, String footer, String bottom) {
-        nms.sendTabColor(player, footer, bottom);
-    }
+  public static void sendTabColor(Player player, String footer, String bottom) {
+    nms.sendTabColor(player, footer, bottom);
+  }
 
-    public static boolean addToWorld(World world, Entity entity, CreatureSpawnEvent.SpawnReason reason) {
-        return nms.addToWorld(world, entity, reason);
-    }
+  public static boolean addToWorld(World world, Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+    return nms.addToWorld(world, entity, reason);
+  }
 
-    public static void setValueAndSignature(Player player, String value, String signature) {
-        nms.setValueAndSignature(player, value, signature);
-    }
+  public static void setValueAndSignature(Player player, String value, String signature) {
+    nms.setValueAndSignature(player, value, signature);
+  }
 
-    public static void sendPacket(Player player, Object packet) {
-        nms.sendPacket(player, packet);
-    }
+  public static void sendPacket(Player player, Object packet) {
+    nms.sendPacket(player, packet);
+  }
 
-    public static void sendTabListAdd(Player player, Player listPlayer) {
-        nms.sendTabListAdd(player, listPlayer);
-    }
+  public static void sendTabListAdd(Player player, Player listPlayer) {
+    nms.sendTabListAdd(player, listPlayer);
+  }
 
-    public static void sendTabListRemove(Player player, Collection<SkinnableEntity> skinnableEntities) {
-        nms.sendTabListRemove(player, skinnableEntities);
-    }
+  public static void sendTabListRemove(Player player, Collection<SkinnableEntity> skinnableEntities) {
+    nms.sendTabListRemove(player, skinnableEntities);
+  }
 
-    public static void sendTabListRemove(Player player, Player listPlayer) {
-        nms.sendTabListRemove(player, listPlayer);
-    }
+  public static void sendTabListRemove(Player player, Player listPlayer) {
+    nms.sendTabListRemove(player, listPlayer);
+  }
 
-    public static SkinnableEntity getSkinnable(Entity entity) {
-        return nms.getSkinnable(entity);
-    }
+  public static SkinnableEntity getSkinnable(Entity entity) {
+    return nms.getSkinnable(entity);
+  }
 
 
-    public static void setHeadYaw(org.bukkit.entity.Entity entity, float yaw) {
-        nms.setHeadYaw(entity, yaw);
-    }
+  public static void setHeadYaw(org.bukkit.entity.Entity entity, float yaw) {
+    nms.setHeadYaw(entity, yaw);
+  }
 
-    public static void setStepHeight(LivingEntity entity, float height) {
-        nms.setStepHeight(entity, height);
-    }
+  public static void setStepHeight(LivingEntity entity, float height) {
+    nms.setStepHeight(entity, height);
+  }
 
-    public static float getStepHeight(LivingEntity entity) {
-        return nms.getStepHeight(entity);
-    }
+  public static float getStepHeight(LivingEntity entity) {
+    return nms.getStepHeight(entity);
+  }
 
-    public static void replaceTrackerEntry(Player player) {
-        nms.replaceTrackerEntry(player);
-    }
+  public static void replaceTrackerEntry(Player player) {
+    nms.replaceTrackerEntry(player);
+  }
 
-    public static void flyingMoveLogic(LivingEntity entity, float f, float f1) {
-        nms.flyingMoveLogic(entity, f, f1);
-    }
+  public static void flyingMoveLogic(LivingEntity entity, float f, float f1) {
+    nms.flyingMoveLogic(entity, f, f1);
+  }
 
-    public static void removeFromPlayerList(Player type) {
-        nms.removeFromPlayerList(type)
-        ;
-    }
 
-    public static void removeFromServerPlayerList(Player player) {
-        nms.removeFromServerPlayerList(player);
-    }
+  public static void removeFromPlayerList(Player type) {
+    nms.removeFromPlayerList(type);
+  }
 
-    public static void removeFromWorld(Entity entity) {
-        nms.removeFromWorld(entity);
-    }
+  public static void updateAI(Object entity) {
+    nms.updateAI(entity);
+  }
+  public static void updateNavigation(Object navigation) {
+    nms.updateNavigation(navigation);
+  }
 
-    public static void playAnimation(Entity entity, int id) {
-        nms.playAnimation(entity, id);
-    }
+  public static boolean isNavigationFinished(Object navigation) {
+    return nms.isNavigationFinished(navigation);
+  }
 
-    public static void sendPacketNearby(Player from, Location location, Object packet, double radius) {
-        nms.sendPacketNearby(from, location, packet, radius);
-    }
 
-    public static void sendPacketsNearby(Player from, Location location, Collection<Object> packet, double radius) {
-        nms.sendPacketsNearby(from, location, packet, radius);
-    }
+  public static void removeFromServerPlayerList(Player player) {
+    nms.removeFromServerPlayerList(player);
+  }
 
-    public static void refreshNPCSlot(Entity entity, int slot, ItemStack stack) {
-        nms.refreshNPCSlot(entity, slot, stack);
-    }
+  public static void look(Entity entity, float yaw, float pitch) {
+    nms.look(entity, yaw, pitch);
+  }
 
-    public static IArmorStand createArmorStand(Location location, String name, HologramLine line) {
-        return nms.createArmorStand(location, name, line);
-    }
+  public static void look(Entity from, Entity to) {
+    nms.look(from, to);
+  }
 
-    public static Hologram getHologram(Entity entity) {
-        return nms.getHologram(entity);
-    }
+  public static void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate) {
+    nms.look(entity, to, headOnly, immediate);
+  }
 
-    public static boolean isHologramEntity(Entity entity) {
-        return nms.isHologramEntity(entity);
-    }
+  public static void removeFromWorld(Entity entity) {
+    nms.removeFromWorld(entity);
+  }
 
-    public static String[] getPlayerTextures(Player player) {
-        return nms.getPlayerTextures(player);
-    }
+  public static void playAnimation(Entity entity, int id) {
+    nms.playAnimation(entity, id);
+  }
+
+  public static void sendPacketNearby(Player from, Location location, Object packet, double radius) {
+    nms.sendPacketNearby(from, location, packet, radius);
+  }
+
+  public static void sendPacketsNearby(Player from, Location location, Collection<Object> packet, double radius) {
+    nms.sendPacketsNearby(from, location, packet, radius);
+  }
+
+  public static void refreshNPCSlot(Entity entity, int slot, ItemStack stack) {
+    nms.refreshNPCSlot(entity, slot, stack);
+  }
+
+  public static IArmorStand createArmorStand(Location location, String name, HologramLine line) {
+    return nms.createArmorStand(location, name, line);
+  }
+
+  public static Hologram getHologram(Entity entity) {
+    return nms.getHologram(entity);
+  }
+
+  public static boolean isHologramEntity(Entity entity) {
+    return nms.isHologramEntity(entity);
+  }
+
+  public static String[] getPlayerTextures(Player player) {
+    return nms.getPlayerTextures(player);
+  }
+
 
 
 }

@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.essentials.commands;
+package com.uzm.hylex.core.commands;
 
 import com.google.common.collect.Lists;
 import com.uzm.hylex.core.Core;

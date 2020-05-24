@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.essentials.commands;
+package com.uzm.hylex.core.commands;
 
 import com.google.common.collect.Lists;
 import com.uzm.hylex.core.Core;
@@ -22,7 +22,7 @@ public class FlyCommand implements CommandExecutor {
 
     Player player = (Player) sender;
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
-    if (Core.DISABLE_FLY && !player.hasPermission("hylex.staff")) {
+    if (Core.DISABLE_FLY && !player.hasPermission("hylex.stafffly")) {
       player.sendMessage("§b[Hylex] §cComando desabilitado.");
       return true;
     }

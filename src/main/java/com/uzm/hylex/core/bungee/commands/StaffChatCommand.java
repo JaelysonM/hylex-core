@@ -35,6 +35,9 @@ public class StaffChatCommand extends Command {
           players.sendMessage("§5[STAFF] " + Group.getColored(player) + "§f: " + message);
         }
       }
+    }else {
+      sender.sendMessage(TextComponent.fromLegacyText("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando."));
+
     }
   }
 }

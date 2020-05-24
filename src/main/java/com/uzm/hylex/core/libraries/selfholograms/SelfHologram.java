@@ -140,7 +140,7 @@ public class SelfHologram {
 
             customNameMethod.invoke(entityArmorStand, version.isAboveOrEqual(MinecraftVersion.V1_13) ?
                     CHAT_COMPONENT_TEXT_CONSTRUCTOR.invoke(line) : line);
-            customNameVisibilityMethod.invoke(entityArmorStand, true);
+            customNameVisibilityMethod.invoke(entityArmorStand, !line.equalsIgnoreCase("§j"));
             gravityMethod.invoke(entityArmorStand, version.isAboveOrEqual(MinecraftVersion.V1_9));
             SET_SMALL_METHOD.invoke(entityArmorStand, true);
             SET_INVISIBLE_METHOD.invoke(entityArmorStand, true);

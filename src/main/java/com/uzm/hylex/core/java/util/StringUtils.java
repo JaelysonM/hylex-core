@@ -1,10 +1,7 @@
 package com.uzm.hylex.core.java.util;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +13,10 @@ import java.util.regex.Pattern;
 public class StringUtils {
 
   private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###");
+
+  private static final int MAX_LENGTH = 4;
+
+  private static final String[] suffix = new String[] {"", "k", "m", "b", "t"};
 
   /**
    * Formata um número "#,###" através do {@link DecimalFormat}
@@ -104,7 +105,6 @@ public class StringUtils {
    */
 
 
-
   public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
     Pattern pattern = Pattern.compile("(?i)(" + String.valueOf(altColorChar) + ")[0-9A-FK-OR]");
 
@@ -115,6 +115,61 @@ public class StringUtils {
     }
 
     return textToTranslate;
+  }
+
+  public static String center(String s, int size) {
+    return center(s, size, ' ');
+  }
+
+  public static String center(String s, int size, char pad) {
+    if (s == null || size <= s.length())
+      return s;
+
+    StringBuilder sb = new StringBuilder(size);
+    for (int i = 0; i < (size - s.length()) / 2; i++) {
+      sb.append(pad);
+    }
+    sb.append(s);
+    while (sb.length() < size) {
+      sb.append(pad);
+    }
+    return sb.toString();
+  }
+
+  public static String progressDataBar(float current, float max, int amplifier) {
+    String c = "■";
+    StringBuilder prog = new StringBuilder("&8[");
+    float percentageDone = (current / max) * 100;
+    float percentageRemaining = 100 - percentageDone;
+
+    float quantitySquare1 = (percentageDone * amplifier) / 100;
+    float quantitySquare2 = (percentageRemaining * amplifier) / 100;
+    if (Math.round(quantitySquare1) >= 1) {
+      prog.append("&b");
+    }
+    while (Math.round(quantitySquare1) > 0) {
+      quantitySquare1--;
+      prog.append(c);
+    }
+    if (Math.round(quantitySquare1) == 0 && Math.round(quantitySquare2) >= 1) {
+      prog.append("&7");
+    }
+    while (Math.round(quantitySquare2) > 0) {
+      quantitySquare2--;
+      prog.append(c);
+    }
+    prog.append("&8]");
+
+    return prog.toString();
+  }
+
+  public static String formatNumberUS(double number) {
+    String r = new DecimalFormat("##0E0").format(number);
+    r = r.replaceAll("E[0-9]", suffix[Character.getNumericValue(r.charAt(r.length() - 1)) / 3]);
+    while (r.length() > MAX_LENGTH || r.matches("[0-9]+\\.[a-z]")) {
+      r = r.substring(0, r.length() - 2) + r.substring(r.length() - 1);
+    }
+    return r;
   }
 
   /**
@@ -282,5 +337,26 @@ public class StringUtils {
     }
 
     return result.toString().split("\n");
+  }
+
+
+
+  private static String[] DAY_OF_WEEK = new String[] {"domingo","segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"};
+
+  private static String[] MONTHS = new String[] {"janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"};
+
+  public static String formatDateBR(long ms) {
+    Calendar c = Calendar.getInstance();
+    c.setTime(new Date(ms));
+    String hour = String.valueOf((c.get(Calendar.HOUR_OF_DAY) > 12 ? (c.get(Calendar.HOUR_OF_DAY) - 12) : c.get(Calendar.HOUR_OF_DAY)));
+    String minute = (c.get(Calendar.HOUR_OF_DAY) > 12 ? c.get(Calendar.MINUTE) + " da tarde" : c.get(Calendar.MINUTE) + " da manhã");
+    String day_of_week = DAY_OF_WEEK[c.get(Calendar.DAY_OF_WEEK) - 1 ];
+    String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+    String month = MONTHS[c.get(Calendar.MONTH)];
+    String year = String.valueOf(c.get(Calendar.YEAR));
+
+    return day_of_week + ", " + day + " de " + month + " de " + year + " às " + (hour.length() == 1 ? "0" + hour : hour) + ":" + (c.get(Calendar.MINUTE) < 10 ?
+      "0" + minute :
+      minute);
   }
 }

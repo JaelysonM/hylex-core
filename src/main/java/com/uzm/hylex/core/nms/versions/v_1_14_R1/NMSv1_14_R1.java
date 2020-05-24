@@ -256,6 +256,11 @@ public class NMSv1_14_R1 implements INMS {
 
     }
 
+    @Override
+    public void look(org.bukkit.entity.Entity entity, float yaw, float pitch) {
+
+    }
+
 
     @Override
     public Hologram getHologram(org.bukkit.entity.Entity entity) {
@@ -270,6 +275,11 @@ public class NMSv1_14_R1 implements INMS {
 
     @Override
     public boolean isHologramEntity(org.bukkit.entity.Entity entity) {
+        return false;
+    }
+
+    @Override
+    public boolean isNavigationFinished(Object navigation) {
         return false;
     }
 
@@ -293,5 +303,26 @@ public class NMSv1_14_R1 implements INMS {
         String signature = property.getSignature();
         return new String[] {texture, signature};
     }
+
+    @Override
+    public void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate) {
+
+    }
+
+    @Override
+    public void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to) {
+
+    }
+
+    @Override
+    public void updateNavigation(Object navigation) {
+
+    }
+
+    @Override
+    public void updateAI(Object entity) {
+
+    }
+
 
 }

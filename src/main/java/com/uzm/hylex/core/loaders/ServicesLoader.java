@@ -50,8 +50,8 @@ public class ServicesLoader {
           hp.loadAccount();
         }
       } catch (Exception ex) {
-        System.err.println("[HylexSocket.io - ]  Não foi possível processar os dados recibos.");
         ex.printStackTrace();
+        System.err.println("[Hylex - Socket.io ]  Não foi possível processar os dados recibos.");
       }
     });
   }

@@ -1,7 +1,12 @@
 package com.uzm.hylex.core.bungee.loaders;
 
+import com.uzm.hylex.core.Core;
+import com.uzm.hylex.core.bungee.Bungee;
 import com.uzm.hylex.core.bungee.api.HylexPlayer;
+import com.uzm.hylex.core.bungee.controllers.QueueController;
 import com.uzm.hylex.services.lan.WebSocket;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import org.json.simple.JSONArray;
@@ -52,8 +57,62 @@ public class ServicesLoader {
           hp.loadAccount();
         }
       } catch (Exception ex) {
-        System.err.println("[HylexSocket.io - ]  Não foi possível processar os dados recibos.");
-        ex.printStackTrace();
+        System.err.println("[Socket.io]  Não foi possível processar os dados recibos.");
+      }
+    });
+    socket.getSocket().on("send-restart-require", args -> {
+      if (!(args[0] instanceof org.json.JSONObject)) {
+        return;
+      }
+
+      try {
+        JSONObject response = (JSONObject) new JSONParser().parse(args[0].toString());
+
+      String clientName = (String) response.get("name");
+        QueueController.addToQueue((Bungee.getInstance().getProxy().getServerInfo(clientName.replace("core-bedwars-", ""))));
+        Bungee.getInstance().getLogger().info("§b[Hylex Module: Core] §7Requiring a permission to " + ( clientName.replace("core-bedwars-", "")) + " to restarting");
+
+
+      } catch (Exception ex) {
+        System.err.println("[Socket.io ]  Não foi possível processar os dados recibos.");
+      }
+    });
+
+
+    socket.getSocket().on("save-mini", args -> {
+      if (!(args[0] instanceof org.json.JSONObject)) {
+        return;
+      }
+
+      try {
+        JSONObject response = (JSONObject) new JSONParser().parse(args[0].toString());
+
+        String miniName = (String) response.get("miniName");
+        String nickname = (String) response.get("nickname");
+
+        if (Bungee.getInstance().getProxy().getPlayer(nickname) ==null) {
+          return;
+        }
+        ProxiedPlayer pp = Bungee.getInstance().getProxy().getPlayer(nickname);
+
+        if (HylexPlayer.getByPlayer(pp) != null) {
+          HylexPlayer.getByPlayer(pp).setCurrentMini(miniName);
+        }
+      } catch (Exception ex) {
+        System.err.println("[Socket.io ]  Não foi possível processar os dados recibos.");
+      }
+    });
+
+    socket.getSocket().on("send-finished-restart", args -> {
+      if (!(args[0] instanceof org.json.JSONObject)) {
+        return;
+      }
+      try {
+        JSONObject response = (JSONObject) new JSONParser().parse(args[0].toString());
+        String clientName = ((String) response.get("name")).replace("core-bedwars-", "");
+        QueueController.isRestarting().remove(Bungee.getInstance().getProxy().getServerInfo(clientName).getName());
+      } catch (Exception ex) {
+        System.err.println("[Socket.io]  Não foi possível processar os dados recibos.");
       }
     });
   }

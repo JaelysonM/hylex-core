@@ -24,4 +24,6 @@ public interface Trait {
    * chamado ao NPC ser despawnado.
    */
   public void onDespawn();
+
+  public void run();
 }

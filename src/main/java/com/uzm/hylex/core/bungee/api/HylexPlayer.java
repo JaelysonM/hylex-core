@@ -22,12 +22,16 @@ public class HylexPlayer {
 
   private Map<ProxiedPlayer, Long> lastTell;
 
+  private String currentMini;
+
   private boolean accountLoaded;
 
   public HylexPlayer(ProxiedPlayer player) {
     this.player = player;
     this.group = com.uzm.hylex.core.bungee.api.Group.getPlayerGroup(player);
     this.schemas = new HashMap<>();
+    this.lastTell = new HashMap<>();
+    this.name = player.getName();
   }
 
   public void setName(String name) {
@@ -90,6 +94,15 @@ public class HylexPlayer {
     WebSocket.get("core-bungee").getSocket().emit("data-save", json);
   }
 
+
+  public void setCurrentMini(String currentMini) {
+    this.currentMini = currentMini;
+  }
+
+  public String getCurrentMini() {
+    return currentMini;
+  }
+
   public void destroy() {
     this.name = null;
     this.player = null;
@@ -97,11 +110,15 @@ public class HylexPlayer {
     this.schemas.values().forEach(map -> map.values().forEach(DataContainer::gc));
     this.schemas.clear();
     this.schemas = null;
+    lastTell.clear();
+    lastTell = null;
+    currentMini = null;
+
   }
 
   public List<HylexPlayer> getLastMessager() {
-    List<HylexPlayer> tellers = this.lastTell.entrySet().stream().filter(entry -> getByPlayer(entry.getKey()) !=null).sorted((a,b) -> Long.compare(b.getValue(), a.getValue())).map(entry-> getByPlayer(entry.getKey())).collect(
-      Collectors.toList());
+    List<HylexPlayer> tellers = this.lastTell.entrySet().stream().filter(entry -> getByPlayer(entry.getKey()) != null).sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+      .map(entry -> getByPlayer(entry.getKey())).collect(Collectors.toList());
     this.lastTell.clear();
     return tellers;
   }

@@ -29,5 +29,9 @@ public abstract class NPCTrait implements Trait {
   public void onDespawn() {}
 
   @Override
+  public void run() {}
+
+
+  @Override
   public void onRemove() {}
 }

@@ -3,6 +3,7 @@ package com.uzm.hylex.core.bungee;
 import com.uzm.hylex.core.bungee.commands.*;
 import com.uzm.hylex.core.bungee.configuration.ConfigurationCreator;
 import com.uzm.hylex.core.bungee.controllers.MotdController;
+import com.uzm.hylex.core.bungee.controllers.QueueController;
 import com.uzm.hylex.core.bungee.listeners.ChatListener;
 import com.uzm.hylex.core.bungee.listeners.PluginMessageListener;
 import com.uzm.hylex.core.bungee.listeners.ProxyConnectListener;
@@ -38,6 +39,9 @@ public class Bungee extends Plugin {
     getPluginManager().registerCommand(this, new ReportCommand());
     getPluginManager().registerCommand(this, new StaffChatCommand());
     getPluginManager().registerCommand(this, new LobbyCommand());
+    getPluginManager().registerCommand(this, new SendReportCommand());
+    getPluginManager().registerCommand(this, new MegaTeleportCommand());
+    getPluginManager().registerCommand(this, new ToggleCommand());
 
     getPluginManager().registerListener(this, new ChatListener());
     getPluginManager().registerListener(this, new ProxyPingListener());
@@ -47,6 +51,7 @@ public class Bungee extends Plugin {
     new ConfigurationCreator(this, "%datafolder%/setup.yml");
 
     MotdController.load();
+    QueueController.run();
 
     new ServicesLoader(this);
   }

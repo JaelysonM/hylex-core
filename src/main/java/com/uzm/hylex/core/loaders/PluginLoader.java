@@ -1,11 +1,13 @@
 package com.uzm.hylex.core.loaders;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.Maps;
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.java.util.configuration.ConfigurationCreator;
 import com.uzm.hylex.core.java.util.JavaReflections;
 import com.uzm.hylex.core.libraries.holograms.HologramLibrary;
 import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
+import com.uzm.hylex.core.listeners.protocol.TabComplete;
 import com.uzm.hylex.core.nms.NMS;
 import com.uzm.hylex.core.spigot.enums.MinecraftVersion;
 import org.bukkit.Bukkit;
@@ -38,6 +40,7 @@ public class PluginLoader {
     new ServicesLoader(this);
     registerCommandsPermission();
     registerCommands();
+    registerProtocolListeners();
   }
 
   public Core getCore() {
@@ -54,7 +57,7 @@ public class PluginLoader {
 
   public void registerCommands() {
     long registered = 0;
-    List<Class<?>> classes = JavaReflections.getClasses("com.uzm.hylex.core.essentials.commands", Core.getInstance());
+    List<Class<?>> classes = JavaReflections.getClasses("com.uzm.hylex.core.commands", Core.getInstance());
 
     try {
       for (Class<?> c : classes) {
@@ -73,14 +76,22 @@ public class PluginLoader {
     Bukkit.getConsoleSender().sendMessage("§b[Hylex - Core] §7We're registered §f(" + registered + "/" + classes.size() + ") §7commands.");
   }
 
+  public void registerProtocolListeners() {
+    ProtocolLibrary.getProtocolManager().addPacketListener(new TabComplete());
+  }
+
+
+
   public void registerCommandsPermission() {
+    permissions.put("group", "hylex.group");
+
     permissions.put("tp", "hylex.teleport");
     permissions.put("tpall", "hylex.tpall");
     permissions.put("gamemode", "hylex.gamemode");
     permissions.put("gm", "hylex.gamemode");
 
-    permissions.put("fly", "hylex.gamemode");
-    permissions.put("voar", "hylex.voar");
+    permissions.put("fly", "hylex.fly");
+    permissions.put("voar", "hylex.fly");
     permissions.put("speed", "hylex.speed");
   }
 }

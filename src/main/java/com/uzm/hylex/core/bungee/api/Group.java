@@ -56,7 +56,7 @@ public enum Group {
   public static String getColored(String player) {
     ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(player);
     if (pp != null) {
-      return getPlayerGroup(pp).getColor() + pp.getName();
+      return getPlayerGroup(pp).getDisplay() + pp.getName();
     }
 
     return "§7" + player;

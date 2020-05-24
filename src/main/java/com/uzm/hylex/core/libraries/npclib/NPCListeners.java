@@ -1,6 +1,7 @@
 package com.uzm.hylex.core.libraries.npclib;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import com.uzm.hylex.core.libraries.npclib.api.NPC;
 import com.uzm.hylex.core.libraries.npclib.api.event.*;
@@ -24,6 +25,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +97,7 @@ public class NPCListeners implements Listener {
     Team team = evt.getPlayer().getScoreboard().getTeam("mNPCS");
 
     if (team == null) {
-        
+
     }
   }
 
@@ -136,7 +138,7 @@ public class NPCListeners implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void onWorldLoad(WorldLoadEvent evt) {
-    for (ChunkCoord coord : toRespawn.keys()) {
+    for (ChunkCoord coord : ImmutableList.copyOf(toRespawn.keys())) {
       if (coord.world.equals(evt.getWorld().getName()) && evt.getWorld().isChunkLoaded(coord.x, coord.z)) {
         respawnAllFromCoord(coord);
       }
@@ -149,7 +151,7 @@ public class NPCListeners implements Listener {
       if (npc != null && npc.isSpawned() && npc.getCurrentLocation().getWorld().equals(evt.getWorld())) {
         boolean despawned = npc.despawn();
         if (evt.isCancelled() || !despawned) {
-          for (ChunkCoord coord : toRespawn.keys()) {
+          for (ChunkCoord coord : ImmutableList.copyOf(toRespawn.keys())) {
             if (coord.world.equals(evt.getWorld().getName())) {
               respawnAllFromCoord(coord);
             }
@@ -207,14 +209,9 @@ public class NPCListeners implements Listener {
   }
 
   private void respawnAllFromCoord(ChunkCoord coord) {
-    for (ChunkCoord c : toRespawn.asMap().keySet()) {
-      if (c.equals(coord)) {
-        for (NPCInfo info : toRespawn.get(c)) {
-          info.npc.spawn(info.location);
-        }
-
-        toRespawn.asMap().remove(c);
-      }
+    Collection<NPCInfo> npcs = toRespawn.asMap().remove(coord);
+    if (npcs != null) {
+      npcs.forEach(info -> info.npc.spawn(info.location));
     }
   }
 
@@ -239,7 +236,6 @@ public class NPCListeners implements Listener {
       this.location = location;
     }
   }
-
 
   private static class ChunkCoord {
 

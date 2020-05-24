@@ -51,7 +51,7 @@ public class RCommand extends Command {
         }
         List<HylexPlayer> lastTell = hp.getLastMessager();
 
-        if (!hp.getLobbiesContainer().isCanSendTell()) {
+        if (!hp.getLobbiesContainer().canSendTell()) {
           sender.sendMessage(TextComponent.fromLegacyText("§cVocê desativou as mensagens privadas."));
           return;
         }
@@ -62,6 +62,8 @@ public class RCommand extends Command {
 
         String text = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
         HylexPlayer target = lastTell.get(0);
+
+
 
         if (Bungee.getInstance().getProxy().getPlayer(target.getName()) == null) {
           sender.sendMessage(TextComponent.fromLegacyText("§cUsuário não encontrado."));

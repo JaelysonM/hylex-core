@@ -61,6 +61,12 @@ public class MotdCommand extends Command {
               player.sendMessage(TextComponent.fromLegacyText("§6- §8[" + ChatColor.translateAlternateColorCodes('&', motd) + "§8]"));
             });
             break;
+          case "reload":
+            MotdController.pinged.clear();
+            MotdController.motds.clear();
+            MotdController.load();
+            player.sendMessage(TextComponent.fromLegacyText("§e↻ §7Você reiniciou as motds do servidor."));
+            break;
           case "clear":
             player.sendMessage(TextComponent.fromLegacyText("§e✄ §7Você limpou as motds do servidor."));
             MotdController.getMotds().clear();
@@ -76,9 +82,10 @@ public class MotdCommand extends Command {
       default:
         switch (args[0].toLowerCase()) {
           case "add":
-            String text = StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " ").replace("&", "§");
+            String[] split = Arrays.copyOfRange(args, 1, args.length);
+            String text = String.join(" ", split).replace("&", "§");
             TextComponent textC = new TextComponent("§e* §7Você §aadicionou §7uma motd da lista ");
-            TextComponent hover = new TextComponent("§e§lPASSE PARA VER-LA");
+            TextComponent hover = new TextComponent("§e§lVEJA");
             hover.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(text)));
             textC.addExtra(hover);
             player.sendMessage(textC);

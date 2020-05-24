@@ -55,7 +55,7 @@ public class ItemBuilder {
       EnchantmentStorageMeta enchantment = meta instanceof EnchantmentStorageMeta ? ((EnchantmentStorageMeta) meta) : null;
 
       if (split.length > 1) {
-        stack.setAmount(Integer.parseInt(split[1]) > 64 ? 64 : Integer.parseInt(split[1]));
+        stack.setAmount(Math.min(Integer.parseInt(split[1]), 64));
       }
 
       this.lore = new ArrayList<>();
@@ -70,6 +70,7 @@ public class ItemBuilder {
 
         if (opt.startsWith("lore=")) {
           for (String lored : opt.split("=")[1].split("\n")) {
+            if (!lored.contains("&j"))
             lore.add(ChatColor.translateAlternateColorCodes('&', lored));
           }
         }
@@ -173,6 +174,14 @@ public class ItemBuilder {
     this.meta.setDisplayName(dis.replace("&", "§"));
     return this;
   }
+  public ItemBuilder flag(ItemFlag flag) {
+    if (this.item == null) {
+      return this;
+    }
+    this.meta.addItemFlags(flag) ;
+    return this;
+  }
+
 
   public ItemBuilder lore(String... strings) {
     if ((this.item == null) || (this.meta == null)) {

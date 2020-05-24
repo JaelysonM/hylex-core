@@ -1,6 +1,7 @@
 author: Uzm Studio Inc.
 name: ${project.artifactId}
 version: ${project.version}
+api-version: 1.8.8
 
 main: ${main-bukkit}
 commands:
@@ -11,3 +12,4 @@ commands:
   fly:
     aliases: [voar]
   speed:
+  group:

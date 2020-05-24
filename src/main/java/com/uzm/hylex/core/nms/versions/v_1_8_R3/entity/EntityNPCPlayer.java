@@ -1,13 +1,18 @@
-
 package com.uzm.hylex.core.nms.versions.v_1_8_R3.entity;
 
 import com.mojang.authlib.GameProfile;
 import com.uzm.hylex.core.java.util.MathUtils;
+import com.uzm.hylex.core.libraries.npclib.trait.LookClose;
 import com.uzm.hylex.core.nms.NMS;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.network.EmptyNetHandler;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.player.PlayerControllerJump;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.player.PlayerControllerLook;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.player.PlayerControllerMove;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.player.PlayerNavigation;
 import net.minecraft.server.v1_8_R3.*;
 import net.minecraft.server.v1_8_R3.WorldSettings.EnumGamemode;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -26,8 +31,11 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
 
   private final NPC npc;
   private Skin skin;
-  private Skin selfskin;
   private final SkinPacketTracker skinTracker;
+  private PlayerControllerLook controllerLook;
+  private PlayerNavigation navigation;
+  private PlayerControllerMove controllerMove;
+  private PlayerControllerJump controllerJump;
 
   public EntityNPCPlayer(MinecraftServer server, WorldServer world, GameProfile profile, PlayerInteractManager manager, NPC npc) {
     super(server, world, profile, manager);
@@ -47,6 +55,7 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
       super.a(d0, flag, block, blockposition);
     }
   }
+
 
   @Override
   public void collide(net.minecraft.server.v1_8_R3.Entity entity) {
@@ -79,6 +88,20 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
     }
   }
 
+  public NavigationAbstract getNavigation() {
+    return navigation;
+  }
+
+
+  public void setTargetLook(net.minecraft.server.v1_8_R3.Entity target, float yawOffset, float renderOffset) {
+    controllerLook.a(target, yawOffset, renderOffset);
+  }
+
+  public void setTargetLook(Location target) {
+    controllerLook.a(target.getX(), target.getY(), target.getZ(), 10, 40);
+  }
+
+
   @Override
   public void g(double d0, double d1, double d2) {
     if (npc == null || !npc.isProtected()) {
@@ -104,6 +127,19 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
   }
 
   public void initialise() {
+
+
+    AttributeInstance range = getAttributeInstance(GenericAttributes.FOLLOW_RANGE);
+    if (range == null) {
+      range = getAttributeMap().b(GenericAttributes.FOLLOW_RANGE);
+    }
+    range.setValue(25.0D);
+
+    this.controllerJump = new PlayerControllerJump(this);
+    this.controllerMove = new PlayerControllerMove(this);
+    this.controllerLook = new PlayerControllerLook(this);
+    this.navigation = new PlayerNavigation(this, world);
+
     this.playerConnection = new EmptyNetHandler(this);
     this.playerConnection.networkManager.a(playerConnection);
     NMS.setStepHeight(getBukkitEntity(), 1.0f);
@@ -123,6 +159,7 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
   @Override
   public void t_() {
     super.t_();
+
     if (npc == null) {
       return;
     }
@@ -143,7 +180,16 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
       noDamageTicks--;
     }
 
+    if (npc.getTrait(LookClose.class) != null) {
+      npc.getTrait(LookClose.class).run();
+      if (!NMS.isNavigationFinished(navigation)) {
+        NMS.updateNavigation(navigation);
+      }
+    }
+    NMS.updateAI(this);
+
     npc.update();
+
   }
 
   private int ticks = 0;
@@ -171,7 +217,6 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
       NMS.removeFromPlayerList(getBukkitEntity());
     }
   }
-
   @Override
   public Player getEntity() {
     return getBukkitEntity();
@@ -196,6 +241,12 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
     this.skin = skin;
   }
 
+  public void updateAI() {
+    controllerMove.a();
+    controllerLook.a();
+    controllerJump.b();
+  }
+
   @Override
   public Skin getSkin() {
     return skin;
@@ -210,8 +261,19 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
     }
   }
 
+  public PlayerControllerJump getControllerJump() {
+    return controllerJump;
+  }
 
-  static class PlayerNPC  extends CraftPlayer implements SkinnableEntity,NPCHolder  {
+  public PlayerControllerMove getControllerMove() {
+    return controllerMove;
+  }
+
+  public PlayerControllerLook getControllerLook() {
+    return controllerLook;
+  }
+
+  static class PlayerNPC extends CraftPlayer implements SkinnableEntity, NPCHolder {
 
     private NPC npc;
 

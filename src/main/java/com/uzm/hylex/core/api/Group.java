@@ -4,21 +4,22 @@ import org.bukkit.entity.Player;
 
 public enum Group {
 
-  HYLEX("§bHylex", "§b[Hylex] ", "*", "a", true),
-  DESENVOLVEDOR("§6Dev", "§6[Dev] ", "group.dev", "b", true),
-  GERENTE("§4Gerente", "§4[Gerente] ", "group.gerente", "c", true),
-  ADMIN("§9Admin", "§9[Admin] ", "group.admin", "d", true),
-  MODERADOR("§2Moderador", "§2[Moderador] ", "group.mod", "e", true),
-  AJUDANTE("§eAjudante", "§e[Ajudante] ", "group.ajd", "f", true),
-  PASSE("§3Passe", "§3[Passe] ", "group.pass", "g"),
-  STREAMER("§5Streamer", "§5[Streamer] ", "streamer", "h", true),
-  YOUTUBER("§cYoutuber", "§c[Youtuber] ", "group.youtuber", "i", true),
-  MINIYT("§cMiniYT", "§c[MiniYT] ", "group.miniyt", "j", true),
-  EMERALD("§aEmerald", "§a[Emerald] ", "group.emerald", "k"),
-  DIAMOND("§bDiamond", "§b[Diamond] ", "group.diamond", "l"),
-  GOLD("§eGold", "§e[Gold] ", "group.gold", "m"),
-  NORMAL("§7Normal", "§7", "group.normal", "n");
+  HYLEX("hylex", "§bHylex", "§b[Hylex] ", "*", "a", true),
+  DESENVOLVEDOR("developer", "§6Dev", "§6[Dev] ", "group.dev", "b", true),
+  GERENTE("manager", "§4Gerente", "§4[Gerente] ", "group.gerente", "c", true),
+  ADMIN("administrator", "§9Admin", "§9[Admin] ", "group.admin", "d", true),
+  MODERADOR("moderator", "§2Moderador", "§2[Moderador] ", "group.mod", "e", true),
+  AJUDANTE("helper", "§eAjudante", "§e[Ajudante] ", "group.ajd", "f", true),
+  PASSE("pass", "§3Passe", "§3[Passe] ", "group.pass", "g"),
+  STREAMER("streamer", "§5Streamer", "§5[Streamer] ", "streamer", "h", true),
+  YOUTUBER("youtuber", "§cYoutuber", "§c[Youtuber] ", "group.youtuber", "i", true),
+  MINIYT("miniyt", "§cMiniYT", "§c[MiniYT] ", "group.miniyt", "j", true),
+  EMERALD("emerald", "§aEmerald", "§a[Emerald] ", "group.emerald", "k"),
+  DIAMOND("diamond", "§bDiamond", "§b[Diamond] ", "group.diamond", "l"),
+  GOLD("gold", "§eGold", "§e[Gold] ", "group.gold", "m"),
+  NORMAL("default", "§7Normal", "§7", "group.normal", "n");
 
+  private String lpName;
   private String color;
   private String display;
   private String permission;
@@ -26,17 +27,22 @@ public enum Group {
   private String name;
   private boolean alwaysVisible;
 
-  Group(String name, String display, String permission, String order, boolean visible) {
-    this(name, display, permission, order);
+  Group(String lpName, String name, String display, String permission, String order, boolean visible) {
+    this(lpName, name, display, permission, order);
     this.alwaysVisible = visible;
   }
 
-  Group(String name, String display, String permission, String order) {
+  Group(String lpName, String name, String display, String permission, String order) {
+    this.lpName = lpName;
     this.display = display;
     this.order = order;
     this.permission = permission;
     this.name = name;
     this.color = this.name.substring(0, 2);
+  }
+
+  public String getLpName() {
+    return this.lpName;
   }
 
   public String getColor() {
@@ -82,5 +88,15 @@ public enum Group {
     }
 
     return NORMAL;
+  }
+
+  public static Group getGroup(String name) {
+    for (Group group : values()) {
+      if (group.name().equalsIgnoreCase(name)) {
+        return group;
+      }
+    }
+
+    return null;
   }
 }

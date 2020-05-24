@@ -1,6 +1,7 @@
 package com.uzm.hylex.core.libraries.holograms;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import org.bukkit.Chunk;
@@ -14,6 +15,8 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collection;
 
 /**
  * @author Maxter
@@ -35,8 +38,8 @@ public class HologramListeners implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onWorldLoad(WorldLoadEvent evt) {
-    for (ChunkCoord coord : this.toRespawn.keys()) {
+  public void onWorlLoad(WorldLoadEvent evt) {
+    for (ChunkCoord coord : ImmutableList.copyOf(toRespawn.keys())) {
       if (coord.world.equals(evt.getWorld().getName()) && evt.getWorld().isChunkLoaded(coord.x, coord.z)) {
         respawnAllFromCoord(coord);
       }
@@ -48,7 +51,7 @@ public class HologramListeners implements Listener {
     for (Hologram hologram : HologramLibrary.listHolograms()) {
       if (hologram != null && hologram.isSpawned() && hologram.getLocation().getWorld().equals(evt.getWorld())) {
         if (evt.isCancelled()) {
-          for (ChunkCoord coord : this.toRespawn.keys()) {
+          for (ChunkCoord coord : ImmutableList.copyOf(toRespawn.keys())) {
             if (coord.world.equals(evt.getWorld().getName())) {
               respawnAllFromCoord(coord);
             }
@@ -90,14 +93,9 @@ public class HologramListeners implements Listener {
   }
 
   private void respawnAllFromCoord(ChunkCoord coord) {
-    for (ChunkCoord c : toRespawn.asMap().keySet()) {
-      if (c.equals(coord)) {
-        for (Hologram hologram : toRespawn.get(c)) {
-          hologram.spawn();
-        }
-
-        toRespawn.asMap().remove(c);
-      }
+    Collection<Hologram> holograms = toRespawn.asMap().remove(coord);
+    if (holograms != null) {
+      holograms.stream().filter(Hologram::isSpawned).forEach(Hologram::spawn);
     }
   }
 

@@ -70,4 +70,14 @@ public enum ReportType {
 
     return null;
   }
+
+  public static ReportType fromValue(String name) {
+    for (ReportType type : VALUES) {
+      if (type.toString().equalsIgnoreCase(name)) {
+        return type;
+      }
+    }
+
+    return null;
+  }
 }

@@ -13,8 +13,10 @@ import com.uzm.hylex.services.lan.WebSocket;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -41,6 +43,7 @@ public class HylexPlayer {
 
   public HylexPlayer(Player player) {
     this.player = player;
+    this.name = player.getName();
     this.group = Group.getPlayerGroup(player);
     this.schemas = new HashMap<>();
     this.lastHit = new HashMap<>();
@@ -48,6 +51,11 @@ public class HylexPlayer {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+
+  public void setGroup(Group group) {
+    this.group = group;
   }
 
   public void setArenaPlayer(IArenaPlayer arenaPlayer) {
@@ -59,7 +67,11 @@ public class HylexPlayer {
 
   public void loadAccount() {
     this.accountLoaded = true;
-    Bukkit.getPluginManager().callEvent(new HylexPlayerLoadEvent(this));
+    Bukkit.getPluginManager().callEvent(new HylexPlayerLoadEvent(HylexPlayer.this));
+    if (schemas.containsKey("Global_Profile")) {
+      getLobbiesContainer().updateLastLogin();
+    }
+
   }
 
   public void computeData(String schema, JSONObject data) {
@@ -86,35 +98,38 @@ public class HylexPlayer {
   }
 
   public void save() {
-    JSONObject json = new JSONObject();
-    json.put("uuid", this.player.getUniqueId());
-    JSONArray schemas = new JSONArray();
-    this.schemas.forEach((key, value) -> {
-      JSONObject object = new JSONObject();
-      JSONObject data = new JSONObject();
-      value.forEach((key2, value2) -> {
-        Object o = value2.get();
-        if (o instanceof String) {
-          if (((String) o).startsWith("{")) {
-            o = value2.getAsJsonObject();
-          } else if ((((String) o).startsWith("["))) {
-            o = value2.getAsJsonArray();
+    if (isAccountLoaded()) {
+      JSONObject json = new JSONObject();
+      json.put("uuid", this.player.getUniqueId());
+      JSONArray schemas = new JSONArray();
+      this.schemas.forEach((key, value) -> {
+        JSONObject object = new JSONObject();
+        JSONObject data = new JSONObject();
+        value.forEach((key2, value2) -> {
+          Object o = value2.get();
+          if (o instanceof String) {
+            if (((String) o).startsWith("{")) {
+              o = value2.getAsJsonObject();
+            } else if ((((String) o).startsWith("["))) {
+              o = value2.getAsJsonArray();
+            }
           }
-        }
 
-        data.put(key2, o);
+          data.put(key2, o);
+        });
+
+        object.put("schemaName", key);
+        object.put("data", data);
+        schemas.add(object);
       });
+      json.put("schemas", schemas);
 
-      object.put("schemaName", key);
-      object.put("data", data);
-      schemas.add(object);
-    });
-    json.put("schemas", schemas);
-
-    WebSocket.get("core-" + Core.SOCKET_NAME).getSocket().emit("data-save", json);
+      WebSocket.get("core-" + Core.SOCKET_NAME).getSocket().emit("data-save", json);
+    }
   }
 
   public void destroy() {
+    this.player.getScoreboard().getTeam(getGroup().getOrder()).removePlayer(player);
     this.name = null;
     this.player = null;
     this.group = null;
@@ -170,7 +185,6 @@ public class HylexPlayer {
     this.player.setExp(0.0F);
     this.player.setExhaustion(0.0F);
     this.player.resetMaxHealth();
-    this.player.setHealthScaled(true);
     this.player.setHealthScale(20.0D);
     this.player.setHealth(20.0D);
     this.player.setMaxHealth(20.0D);
@@ -210,12 +224,18 @@ public class HylexPlayer {
   }
 
   public BedWarsStatisticsContainer getBedWarsStatistics() {
-    return this.getAbstractContainer("BedWarsData", "statistics", BedWarsStatisticsContainer.class);
+    return
+      schemas.get("BedWarsData") !=null ?
+      this.getAbstractContainer("BedWarsData", "statistics", BedWarsStatisticsContainer.class): null;
   }
 
+
+
   public LobbiesContainer getLobbiesContainer() {
-    return this.getAbstractContainer("Global_Profile", "lobbys", LobbiesContainer.class);
+    return schemas.get("BedWarsData") !=null ?
+     this.getAbstractContainer("Global_Profile", "lobbys", LobbiesContainer.class): null;
   }
+
 
   public String getName() {
     return this.name;
@@ -262,6 +282,7 @@ public class HylexPlayer {
     }
     return getByPlayer(player);
   }
+
 
   public static HylexPlayer remove(Player player) {
     STAFF.remove(player.getUniqueId());

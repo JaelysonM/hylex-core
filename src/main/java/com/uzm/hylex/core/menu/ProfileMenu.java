@@ -4,6 +4,7 @@ import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.api.Group;
 import com.uzm.hylex.core.api.HylexPlayer;
 import com.uzm.hylex.core.api.container.BedWarsStatisticsContainer;
+import com.uzm.hylex.core.api.container.LobbiesContainer;
 import com.uzm.hylex.core.spigot.inventories.PlayerMenu;
 import com.uzm.hylex.core.spigot.items.ItemBuilder;
 import com.uzm.hylex.core.spigot.utils.BukkitUtils;
@@ -24,7 +25,10 @@ public class ProfileMenu extends PlayerMenu {
         evt.setCancelled(true);
 
         if (evt.getClickedInventory() != null && evt.getClickedInventory().equals(this.getInventory())) {
-          // TODO: click on items
+          if (evt.getSlot() == 12) {
+            if (HylexPlayer.getByPlayer(this.player) !=null)
+            new SettingsMenu(HylexPlayer.getByPlayer(this.player));
+          }
         }
       }
     }
@@ -33,13 +37,19 @@ public class ProfileMenu extends PlayerMenu {
   public ProfileMenu(HylexPlayer hp) {
     super(hp.getPlayer(), "Meu Perfil", 3);
 
-    this.setItem(10, BukkitUtils
-      .putProfileOnSkull(this.player, new ItemBuilder("SKULL_ITEM:3 : 1 : display=" + Group.getColored(this.player) + " : lore=&fGrupo: " + hp.getGroup().getName()).build()));
+    this.setItem(12, new ItemBuilder(Material.BANNER).name("§bMenu de preferências").lore("§7","§7Clique para abrir o menu de preferências.").build());
 
-    this.setItem(12, new ItemBuilder(Material.BARRIER).name("§cPerfil do BedWars indisponível").lore("","§7As estatísticas apenas aparecerão §7na versão final,","§7junto a um relatório de estatísticas.").build());
+
     BedWarsStatisticsContainer statistics = hp.getBedWarsStatistics();
+    LobbiesContainer global = hp.getLobbiesContainer();
+
+    this.setItem(10, BukkitUtils
+      .putProfileOnSkull(this.player, new ItemBuilder("SKULL_ITEM:3 : 1 : display=" + Group.getColored(this.player) + " : lore=&fGrupo: " + hp.getGroup().getName() + "\n \n&fPrimeiro login: &6" + StringUtils.formatDateBR(global.getFirstLogin())+ "\n&fÚltimo login: &6" + StringUtils.formatDateBR(global.getLastLogin())).build()));
+
+
+
     long wins = statistics.getLong("wins", "global");
-   /* this.setItem(12, new ItemBuilder(
+   this.setItem(14, new ItemBuilder(
       "BED : 1 : display=&aBed Wars : lore=&fPartidas: &7" + StringUtils.formatNumber(statistics.getLong("games", "global")) + "\n \n&fCamas Destruídas: &7" + StringUtils
         .formatNumber(statistics.getLong("bedsBroken", "global")) + "\n&fCamas Perdidas: &7" + StringUtils
         .formatNumber(statistics.getLong("bedsLost", "global")) + "\n \n&fAbates: &7" + StringUtils
@@ -48,7 +58,7 @@ public class ProfileMenu extends PlayerMenu {
         .formatNumber(statistics.getLong("finalKills", "global")) + "\n&fMortes Finais: &7" + StringUtils
         .formatNumber(statistics.getLong("finalDeaths", "global")) + "\n \n&fVitórias: &7" + StringUtils.formatNumber(wins) + "\n&fDerrotas: &7" + StringUtils
         .formatNumber(statistics.getLong("games", "global") - wins) + "\n \n&fCoins: &6" + StringUtils.formatNumber(statistics.getLong("coins", "global"))).build());
-*/
+
     this.register(Core.getInstance());
     this.open();
   }
