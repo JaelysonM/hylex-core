@@ -3,15 +3,19 @@ package com.uzm.hylex.core.loaders;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.google.common.collect.Maps;
 import com.uzm.hylex.core.Core;
-import com.uzm.hylex.core.java.util.configuration.ConfigurationCreator;
 import com.uzm.hylex.core.java.util.JavaReflections;
+import com.uzm.hylex.core.java.util.configuration.ConfigurationCreator;
 import com.uzm.hylex.core.libraries.holograms.HologramLibrary;
 import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
-import com.uzm.hylex.core.listeners.protocol.TabComplete;
 import com.uzm.hylex.core.nms.NMS;
+import com.uzm.hylex.core.protocol.FakeAdapter;
+import com.uzm.hylex.core.protocol.NPCAdapter;
+import com.uzm.hylex.core.protocol.TabComplete;
 import com.uzm.hylex.core.spigot.enums.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ public class PluginLoader {
   private Core core;
   private MinecraftVersion version;
   public HashMap<String, String> permissions = Maps.newHashMap();
+  private PluginManager pm = Bukkit.getServer().getPluginManager();
 
   public PluginLoader(Core core) {
     this.core = core;
@@ -40,7 +45,15 @@ public class PluginLoader {
     new ServicesLoader(this);
     registerCommandsPermission();
     registerCommands();
+    registerListeners();
     registerProtocolListeners();
+
+
+
+    Bukkit.getMessenger().registerOutgoingPluginChannel(getCore(), "hylex-core");
+
+
+
   }
 
   public Core getCore() {
@@ -76,8 +89,29 @@ public class PluginLoader {
     Bukkit.getConsoleSender().sendMessage("§b[Hylex - Core] §7We're registered §f(" + registered + "/" + classes.size() + ") §7commands.");
   }
 
+  public void registerListeners() {
+    long registered = 0;
+    List<Class<?>> classes = JavaReflections.getClasses("com.uzm.hylex.core.listeners", getCore());
+
+    try {
+      for (Class<?> c : classes) {
+        pm.registerEvents((Listener) c.newInstance(), getCore());
+        registered++;
+      }
+    } catch (Exception e) {
+      System.err.println("Probally An error occurred while trying to register some listeners  ");
+      e.printStackTrace();
+    }
+
+    Bukkit.getConsoleSender().sendMessage("§b[Hylex - Core] §7We're registered §f(" + registered + "/" + classes.size() + ") §7listeners.");
+  }
+
   public void registerProtocolListeners() {
     ProtocolLibrary.getProtocolManager().addPacketListener(new TabComplete());
+    ProtocolLibrary.getProtocolManager().addPacketListener(new NPCAdapter());
+    ProtocolLibrary.getProtocolManager().addPacketListener(new FakeAdapter());
+
+
   }
 
 

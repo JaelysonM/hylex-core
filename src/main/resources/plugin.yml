@@ -13,3 +13,4 @@ commands:
     aliases: [voar]
   speed:
   group:
+  skin:

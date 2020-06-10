@@ -24,7 +24,7 @@ public class TeleportCommand implements CommandExecutor {
     Player player = (Player) sender;
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
     if (!player.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-      player.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+      player.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
       return true;
     }
 
@@ -39,7 +39,7 @@ public class TeleportCommand implements CommandExecutor {
             hp.broadcastAction(HylexMethods.StaffAction.TELEPORTTO, found.getName(), "");
           } else {
             player.sendMessage(
-              HylexMethods.isNumeric(args[0]) || args[0].startsWith("~") ? "§c* Use: /tp <x> <y> <z>" : "§c[Hylex] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
+              HylexMethods.isNumeric(args[0]) || args[0].startsWith("~") ? "§c* Use: /tp <x> <y> <z>" : "§c[Stone] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
           }
           break;
         case 2:
@@ -60,7 +60,7 @@ public class TeleportCommand implements CommandExecutor {
 
             player.sendMessage((HylexMethods.isNumeric(args[0]) && HylexMethods.isNumeric(args[1])) || (args[0].startsWith("~") && args[1].startsWith("~")) ?
               "§c* Use: /tp <x> <y> <z>" :
-              "§c[Hylex] '§f" + String.join(", ", offline) + "§c' §cnão está(ão) conectado(s) a este servidor.");
+              "§c[Stone] '§f" + String.join(", ", offline) + "§c' §cnão está(ão) conectado(s) a este servidor.");
           }
           break;
         case 3:
@@ -75,7 +75,7 @@ public class TeleportCommand implements CommandExecutor {
 
             hp.broadcastAction(HylexMethods.StaffAction.TELEPORTTO, String.join(", ", array), "");
           } else {
-            player.sendMessage("§c[Hylex] As coordenadas cedidas devem ser números.");
+            player.sendMessage("§c[Stone] As coordenadas cedidas devem ser números.");
           }
           break;
         case 4:
@@ -91,10 +91,10 @@ public class TeleportCommand implements CommandExecutor {
 
               hp.broadcastAction(HylexMethods.StaffAction.TELEPORT, target.getName(), String.join(", ", array));
             } else {
-              player.sendMessage("§c[Hylex] As coordenadas cedidas devem ser números.");
+              player.sendMessage("§c[Stone] As coordenadas cedidas devem ser números.");
             }
           } else {
-            player.sendMessage("§c[Hylex] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
+            player.sendMessage("§c[Stone] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
           }
           break;
         default:

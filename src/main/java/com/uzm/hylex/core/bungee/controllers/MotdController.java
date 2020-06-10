@@ -69,6 +69,6 @@ public class MotdController {
   }
 
   public static String getRandom() {
-    return motds.isEmpty() ? "§b§lHYLEX §eVenha jogar conosco." : ChatColor.translateAlternateColorCodes('&', motds.get(ThreadLocalRandom.current().nextInt(motds.size())).replace("<newline>", "\n"));
+    return motds.isEmpty() ? "§c§lHYLEX §eVenha jogar conosco." : ChatColor.translateAlternateColorCodes('&', motds.get(ThreadLocalRandom.current().nextInt(motds.size())).replace("<newline>", "\n"));
   }
 }

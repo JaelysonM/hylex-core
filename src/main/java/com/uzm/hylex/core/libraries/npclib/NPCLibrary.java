@@ -86,7 +86,9 @@ public class NPCLibrary {
     return ImmutableList.copyOf(npcs);
   }
 
-
+  public static NPC findNPC(UUID uuid) {
+    return listNPCS().stream().filter(npc -> npc.getUUID().equals(uuid)).findFirst().orElse(null);
+  }
   public static List<NPC> getNpcs() {
     return npcs;
   }

@@ -23,11 +23,11 @@ public class FlyCommand implements CommandExecutor {
     Player player = (Player) sender;
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
     if (Core.DISABLE_FLY && !player.hasPermission("hylex.stafffly")) {
-      player.sendMessage("§b[Hylex] §cComando desabilitado.");
+      player.sendMessage("§c[Stone] §cComando desabilitado.");
       return true;
     }
     if (!player.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-      player.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+      player.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
       return true;
     }
 
@@ -45,7 +45,7 @@ public class FlyCommand implements CommandExecutor {
             target.sendMessage(target.getAllowFlight() ? "§eVocê ativou o modo de vôo do jogador." : "§eVocê desativou o modo de vôo do jogador.");
             hp.broadcastAction(HylexMethods.StaffAction.FLY, target.getName(), target.getAllowFlight() ? "Voando" : "Não voando");
           } else {
-            player.sendMessage("§c[Hylex] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
+            player.sendMessage("§c[Stone] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
           }
         } else {
           help(player.getPlayer(), label);

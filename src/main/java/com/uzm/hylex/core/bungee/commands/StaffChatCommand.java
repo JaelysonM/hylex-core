@@ -36,7 +36,7 @@ public class StaffChatCommand extends Command {
         }
       }
     }else {
-      sender.sendMessage(TextComponent.fromLegacyText("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando."));
+      sender.sendMessage(TextComponent.fromLegacyText("§c[Stone] §cSem §c§npermissão §cpara executar esse comando."));
 
     }
   }

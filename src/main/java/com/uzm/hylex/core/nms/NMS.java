@@ -6,7 +6,9 @@ import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.nms.interfaces.IArmorStand;
 import com.uzm.hylex.core.nms.interfaces.INMS;
+import com.uzm.hylex.core.nms.interfaces.ISkinFactory;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.NMSv1_8_R3;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.SkinFactory;
 import com.uzm.hylex.core.spigot.enums.MinecraftVersion;
 import com.uzm.hylex.core.spigot.features.Titles;
 import org.bukkit.Location;
@@ -22,12 +24,14 @@ import java.util.Collection;
 public class NMS {
 
   private static INMS nms;
+  private static ISkinFactory factory;
 
 
   public static boolean setupNMS(MinecraftVersion version) {
 
     if (version == MinecraftVersion.V1_8) {
       nms = new NMSv1_8_R3();
+      factory = new SkinFactory();
       return true;
     }
     return false;
@@ -166,6 +170,26 @@ public class NMS {
   public static String[] getPlayerTextures(Player player) {
     return nms.getPlayerTextures(player);
   }
+
+  public static void applySkin(Player p, Object props) {
+     factory.applySkin(p,props);
+  }
+
+  public static void removeSkin(Player p) {
+    factory.removeSkin(p);
+  }
+
+  public static void updateSkin(Player p) {
+    factory.updateSkin(p);
+  }
+
+  public static void clearPathfinderGoals(Object entity) {
+    nms.clearPathfinderGoals(entity);
+  }
+  public static void refreshPlayer(Player player) {
+    nms.refreshPlayer(player);
+  }
+
 
 
 

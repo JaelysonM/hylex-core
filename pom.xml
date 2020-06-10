@@ -42,6 +42,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-1.8.8</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
@@ -68,6 +74,12 @@
             <version>latest</version>
             <scope>system</scope>
             <systemPath>D:/dev/jars/BungeeCord.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

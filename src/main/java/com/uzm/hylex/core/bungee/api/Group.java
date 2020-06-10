@@ -4,7 +4,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public enum Group {
-  HYLEX("§bHylex", "§b[Hylex] ", "*", 100),
+  HYLEX("§6Master", "§6[Master] ", "*", 100),
   DESENVOLVEDOR("§6Dev", "§6[Dev] ", "group.dev", 30),
   GERENTE("§4Gerente", "§4[Gerente] ", "group.gerente", 25),
   ADMIN("§9Admin", "§9[Admin] ", "group.admin", 20),

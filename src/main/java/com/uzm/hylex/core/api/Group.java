@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 public enum Group {
 
-  HYLEX("hylex", "§bHylex", "§b[Hylex] ", "*", "a", true),
+  MASTER("master", "§6Master", "§6[Master] ", "*", "a", true),
   DESENVOLVEDOR("developer", "§6Dev", "§6[Dev] ", "group.dev", "b", true),
   GERENTE("manager", "§4Gerente", "§4[Gerente] ", "group.gerente", "c", true),
   ADMIN("administrator", "§9Admin", "§9[Admin] ", "group.admin", "d", true),

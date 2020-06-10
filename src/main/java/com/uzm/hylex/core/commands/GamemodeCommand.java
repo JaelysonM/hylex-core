@@ -26,7 +26,7 @@ public class GamemodeCommand implements CommandExecutor {
     Player player = (Player) sender;
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
     if (!player.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-      player.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+      player.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
       return true;
     }
 
@@ -37,7 +37,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "creative":
             case "1":
               if (player.getGameMode() == GameMode.CREATIVE) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
 
@@ -48,7 +48,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "survival":
             case "0":
               if (player.getGameMode() == GameMode.SURVIVAL) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
               player.sendMessage("§eSeu modo de jogo foi alterado para §f§nSURVIVAL§e.");
@@ -58,7 +58,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "spectator":
             case "3":
               if (player.getGameMode() == GameMode.SPECTATOR) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
               player.sendMessage("§eSeu modo de jogo foi alterado para §f§nESPECTADOR§e.");
@@ -68,7 +68,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "adventure":
             case "2":
               if (player.getGameMode() == GameMode.ADVENTURE) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
               player.sendMessage("§eSeu modo de jogo foi alterado para §f§nADVENTURE§e.");
@@ -83,7 +83,7 @@ public class GamemodeCommand implements CommandExecutor {
         case 2:
           Player target = Bukkit.getPlayer(args[0]);
           if (target == null) {
-            player.sendMessage("§c[Hylex] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
+            player.sendMessage("§c[Stone] '§f" + args[0] + "§c' §cnão está conectado a este servidor.");
             return true;
           }
 
@@ -91,7 +91,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "creative":
             case "1":
               if (target.getGameMode() == GameMode.CREATIVE) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
               player.sendMessage("§eVocê alterou o modo de jogo de §f" + target.getName() + " §epara §f§nCREATIVE§e.");
@@ -102,7 +102,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "survival":
             case "0":
               if (target.getGameMode() == GameMode.SURVIVAL) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
 
@@ -114,7 +114,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "spectator":
             case "3":
               if (target.getGameMode() == GameMode.SPECTATOR) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
 
@@ -126,7 +126,7 @@ public class GamemodeCommand implements CommandExecutor {
             case "adventure":
             case "2":
               if (target.getGameMode() == GameMode.ADVENTURE) {
-                player.sendMessage("§c[Hylex] Você já está nesse modo de jogo.");
+                player.sendMessage("§c[Stone] Você já está nesse modo de jogo.");
                 return true;
               }
 

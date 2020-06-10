@@ -4,11 +4,13 @@ import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.spigot.features.Titles;
+import net.minecraft.server.v1_8_R3.EntityInsentient;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.NavigationAbstract;
 import net.minecraft.server.v1_8_R3.Packet;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -89,6 +91,11 @@ public interface INMS {
     void updateNavigation(Object navigation);
 
     void updateAI(Object entity);
+
+    void clearPathfinderGoals(Object entity);
+
+    void refreshPlayer(Player player);
+
 
 
 

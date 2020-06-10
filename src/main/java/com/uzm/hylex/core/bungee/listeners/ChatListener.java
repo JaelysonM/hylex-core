@@ -57,7 +57,6 @@ public class ChatListener implements Listener {
           ||command.equalsIgnoreCase("litebans")
           ||command.equalsIgnoreCase("antibot")
           ||command.equalsIgnoreCase("ab")
-          ||command.equalsIgnoreCase("skin")
           ||command.equalsIgnoreCase("sr")
           ||command.equalsIgnoreCase("help")
         ) && !player.hasPermission("hylex.superior")) {

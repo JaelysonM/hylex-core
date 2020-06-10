@@ -39,17 +39,6 @@ public class PlayerChatListener implements Listener {
     }
   }
 
-  @EventHandler
-  void onCommandBlock(PlayerCommandPreprocessEvent e) {
-      String command = e.getMessage().replace("/", "").replace("bukkit:", "").replace("minecraft:", "").split(" ")[0];
-      if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")) && !e.getPlayer().hasPermission("*")) {
-        e.setCancelled(true);
-        e.getPlayer().sendMessage("§c[Hylex] §c§nO acesso a esse comando foi negado.");
-      }
-
-
-
-  }
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onPlayerSpam(AsyncPlayerChatEvent evt) {
@@ -93,19 +82,20 @@ public class PlayerChatListener implements Listener {
       if (help == null) {
         evt.setCancelled(true);
         evt.getPlayer().sendMessage("§cO comando §n'" + evt.getMessage().split(" ")[0].replace("/", "") + "'§c não está acessível ou não existe.");
+       return;
       }
     }
 
     String command = evt.getMessage().split("/")[1].replace("bukkit:", "").replace("minecraft:", "").split(" ")[0];
     if (command.startsWith("bukkit:") && !evt.getPlayer().hasPermission("*")) {
       evt.setCancelled(true);
-      player.sendMessage("§cO acesso a esse comando foi §c§nnegado§c.");
+      player.sendMessage("§cO acesso a esse comando foi negado§c.");
     }
 
     List<String> lists = Arrays.asList(TO_DISABLE);
     if (lists.contains(command)) {
       evt.setCancelled(true);
-      player.sendMessage("§cO acesso a esse comando foi §c§nnegado§c.");
+      player.sendMessage("§cO acesso a esse comando foi §cnegado§c.");
     }
   }
 }

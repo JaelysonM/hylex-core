@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +33,38 @@ public class ServerQueueController {
 
   private int maxPlayers;
 
+  private String priorityPermission;
+
   public ServerQueueController(String name) {
-    this.name=name;
+    this.name = name;
     this.QUEUED_PLAYERS = Lists.newArrayList();
   }
 
+
+  public boolean add(Player player) {
+    if (!getQueue().contains(player)) {
+      if (player.hasPermission(getPriorityPermission())) {
+        int indexQueue = getQueue().stream().filter(pls -> !pls.hasPermission(getPriorityPermission())).map(pls -> getQueue().indexOf(pls)).min(Integer::compare).orElse(0);
+        new ActionBar(player).setMessage("§bVocê furou a fila em entrou em §f#" + (indexQueue + 1) + " de §f" + getQueue().size()).send();
+        getQueue().add(indexQueue, player);
+        return true;
+      } else {
+        this.getQueue().add(player);
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  public void setPriorityPermission(String priorityPermission) {
+    this.priorityPermission = priorityPermission;
+  }
+
+
+  public String getPriorityPermission() {
+    return priorityPermission;
+  }
 
   public String getAddress() {
     return address;
@@ -68,7 +96,7 @@ public class ServerQueueController {
   }
 
   public void setQueue(List<Player> q) {
-     QUEUED_PLAYERS=q;
+    QUEUED_PLAYERS = q;
   }
 
   public void setServer(String server) {
@@ -80,7 +108,7 @@ public class ServerQueueController {
   }
 
   public static ServerQueueController get(String name) {
-   return QUEUES.getOrDefault(name, null);
+    return QUEUES.getOrDefault(name, null);
   }
 
 
@@ -94,13 +122,13 @@ public class ServerQueueController {
 
           if (!q.getQueue().isEmpty()) {
             q.getQueue().forEach(result -> {
-              new ActionBar(result).setMessage("§eVocê está em §f" + (q.getQueue().indexOf(result)  +  1) + "º lugar §ena fila.").send();
+              new ActionBar(result).setMessage("§eVocê está em §f" + (q.getQueue().indexOf(result) + 1) + "º lugar §ena fila.").send();
             });
 
             boolean connected = false;
             int players = 0;
             try {
-              Socket socket = new Socket(q.getAddress().split(":")[0],Integer.parseInt( q.getAddress().split(":")[1]));
+              Socket socket = new Socket(q.getAddress().split(":")[0], Integer.parseInt(q.getAddress().split(":")[1]));
               connected = socket.isConnected();
               DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
               DataInputStream dis = new DataInputStream(socket.getInputStream());
@@ -114,11 +142,11 @@ public class ServerQueueController {
             } catch (Exception ignored) {}
             if (connected) {
               if (players <= q.getMaxPlayers()) {
-                if (HylexPlayer.getByPlayer(q.getQueue().get(0)) !=null) {
+                if (HylexPlayer.getByPlayer(q.getQueue().get(0)) != null) {
                   ProxyUtils.connect(HylexPlayer.getByPlayer(q.getQueue().get(0)), q.getServer());
                   q.getQueue().get(0).sendMessage("§eSendo enviado para " + q.getServer() + "...");
                   q.getQueue().remove(q.getQueue().get(0));
-                }else {
+                } else {
                   q.getQueue().remove(q.getQueue().get(0));
                 }
               }

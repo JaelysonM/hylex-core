@@ -24,6 +24,15 @@ public abstract class Mojang {
   private static final List<Mojang> MOJANGAPIS;
   private static final Cache<String, String> CACHED_UUID, CACHED_PROPERTY;
 
+  static {
+    MOJANGAPIS = new ArrayList<>();
+    MOJANGAPIS.add(new MojangAPI());
+    MOJANGAPIS.add(new MineToolsAPI());
+
+    CACHED_UUID = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
+    CACHED_PROPERTY = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+  }
+
   public static String getUUID(String name) throws InvalidMojangException {
     String id = CACHED_UUID.getIfPresent(name);
     if (id != null) {
@@ -45,6 +54,9 @@ public abstract class Mojang {
   }
 
   public static String getSkinProperty(String id) throws InvalidMojangException {
+    if (CACHED_PROPERTY ==null && id ==null) {
+      return null;
+    }
     String property = CACHED_PROPERTY.getIfPresent(id);
     if (property != null) {
       return property;
@@ -73,12 +85,4 @@ public abstract class Mojang {
         + withoutDashes.substring(20, 32);
   }
 
-  static {
-    MOJANGAPIS = new ArrayList<>();
-    MOJANGAPIS.add(new MojangAPI());
-    MOJANGAPIS.add(new MineToolsAPI());
-
-    CACHED_UUID = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
-    CACHED_PROPERTY = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-  }
 }

@@ -53,6 +53,10 @@ public class BukkitPartyManager implements PluginMessageListener {
   }
 
   public static void enableRequests() {
+    /*
+      TODO Temporary disabled
+     */
+    if (true) return;
     if (REQUEST_PARTIES == null) {
       REQUEST_PARTIES = new BukkitRunnable() {
         @Override

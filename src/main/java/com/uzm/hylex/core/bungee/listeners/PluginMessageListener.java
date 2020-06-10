@@ -4,9 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.uzm.hylex.core.api.party.PartyPlayer;
-import com.uzm.hylex.core.bungee.Bungee;
 import com.uzm.hylex.core.bungee.api.HylexPlayer;
-import com.uzm.hylex.core.bungee.controllers.QueueController;
 import com.uzm.hylex.core.bungee.party.BungeeParty;
 import com.uzm.hylex.core.bungee.party.BungeePartyManager;
 import net.md_5.bungee.api.ProxyServer;
@@ -43,7 +41,7 @@ public class PluginMessageListener implements Listener {
 
 
             } catch (Exception ignore) {
-                ignore.printStackTrace();
+              ignore.printStackTrace();
             }
           } else if (subChannel.equals("Parties")) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();

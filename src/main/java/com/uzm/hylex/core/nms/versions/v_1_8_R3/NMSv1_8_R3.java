@@ -3,10 +3,12 @@ package com.uzm.hylex.core.nms.versions.v_1_8_R3;
 import com.google.common.base.Preconditions;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.java.util.MathUtils;
 import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
 import com.uzm.hylex.core.libraries.npclib.npc.EntityControllers;
+import com.uzm.hylex.core.libraries.npclib.npc.ai.NPCHolder;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.nms.NMS;
 import com.uzm.hylex.core.nms.interfaces.IArmorStand;
@@ -39,21 +41,29 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class NMSv1_8_R3 implements INMS {
-  private FieldAccessor<Set> SET_TRACKERS;
+  private final FieldAccessor<Set> SET_TRACKERS;
+
 
   private static final Location FROM_LOCATION = new Location(null, 0, 0, 0);
-  private static final Set<EntityType> BAD_CONTROLLER_LOOK = EnumSet.of(EntityType.SILVERFISH, EntityType.ENDERMITE,
-    EntityType.ENDER_DRAGON, EntityType.BAT, EntityType.SLIME, EntityType.MAGMA_CUBE, EntityType.HORSE,
-    EntityType.GHAST);
+  private static final Set<EntityType> BAD_CONTROLLER_LOOK =
+    EnumSet.of(EntityType.SILVERFISH, EntityType.ENDERMITE, EntityType.ENDER_DRAGON, EntityType.BAT, EntityType.SLIME, EntityType.MAGMA_CUBE, EntityType.HORSE, EntityType.GHAST);
+
+  private static final FieldAccessor<List> PATHFINDERGOAL_B;
+  private static final FieldAccessor<List> PATHFINDERGOAL_C;
+
+
+  static {
+    PATHFINDERGOAL_B = Accessors.getField(PathfinderGoalSelector.class, 0, List.class);
+    PATHFINDERGOAL_C = Accessors.getField(PathfinderGoalSelector.class, 1, List.class);
+  }
 
   public NMSv1_8_R3() {
     SET_TRACKERS = Accessors.getField(EntityTracker.class, "c", Set.class);
+
 
     FieldAccessor<PlayerMetadataStore> metadatastore = Accessors.getField(CraftServer.class, "playerMetadata", PlayerMetadataStore.class);
     if (!(metadatastore.get(Bukkit.getServer()) instanceof UUIDMetadataStore)) {
@@ -77,7 +87,8 @@ public class NMSv1_8_R3 implements INMS {
   @Override
   public void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate) {
     Entity handle = getHandle(entity);
-    if (immediate || headOnly || BAD_CONTROLLER_LOOK.contains(handle.getBukkitEntity().getType()) || (!(handle instanceof EntityInsentient) && !(handle instanceof EntityNPCPlayer))) {
+    if (immediate || headOnly || BAD_CONTROLLER_LOOK
+      .contains(handle.getBukkitEntity().getType()) || (!(handle instanceof EntityInsentient) && !(handle instanceof EntityNPCPlayer))) {
       Location fromLocation = entity.getLocation(FROM_LOCATION);
       double xDiff, yDiff, zDiff;
       xDiff = to.getX() - fromLocation.getX();
@@ -118,7 +129,7 @@ public class NMSv1_8_R3 implements INMS {
 
   @Override
   public void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to) {
-    Entity handle =getHandle(from), target = getHandle(to);
+    Entity handle = getHandle(from), target = getHandle(to);
     if (BAD_CONTROLLER_LOOK.contains(handle.getBukkitEntity().getType())) {
       if (to instanceof LivingEntity) {
         look(from, ((LivingEntity) to).getEyeLocation(), false, true);
@@ -134,18 +145,87 @@ public class NMSv1_8_R3 implements INMS {
         ((EntityLiving) handle).aK += 360F;
       }
     } else if (handle instanceof EntityNPCPlayer) {
-      ((EntityNPCPlayer)handle).setTargetLook(target, 10F, 40F);
+      ((EntityNPCPlayer) handle).setTargetLook(target, 10F, 40F);
     }
   }
 
   public void updateAI(Object entity) {
-      ((EntityNPCPlayer) entity).updateAI();
+    ((EntityNPCPlayer) entity).updateAI();
 
   }
 
   @Override
+  public void clearPathfinderGoals(Object entity) {
+    if (entity instanceof org.bukkit.entity.Entity) {
+      entity = ((CraftEntity) entity).getHandle();
+    }
+
+    net.minecraft.server.v1_8_R3.Entity handle = (net.minecraft.server.v1_8_R3.Entity) entity;
+    if (handle instanceof EntityInsentient) {
+      EntityInsentient entityInsentient = (EntityInsentient) handle;
+      PATHFINDERGOAL_B.get(entityInsentient.goalSelector).clear();
+      PATHFINDERGOAL_C.get(entityInsentient.targetSelector).clear();
+    }
+  }
+
+  @Override
+  public void refreshPlayer(Player player) {
+    EntityPlayer ep = ((CraftPlayer) player).getHandle();
+
+    int entId = ep.getId();
+
+    PacketPlayOutPlayerInfo removeInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, ep);
+    PacketPlayOutEntityDestroy removeEntity = new PacketPlayOutEntityDestroy(entId);
+    PacketPlayOutNamedEntitySpawn addNamed = new PacketPlayOutNamedEntitySpawn(ep);
+    PacketPlayOutPlayerInfo addInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, ep);
+    PacketPlayOutEntityEquipment itemhand = new PacketPlayOutEntityEquipment(entId, 0, CraftItemStack.asNMSCopy(player.getItemInHand()));
+    PacketPlayOutEntityEquipment helmet = new PacketPlayOutEntityEquipment(entId, 4, CraftItemStack.asNMSCopy(player.getInventory().getHelmet()));
+    PacketPlayOutEntityEquipment chestplate = new PacketPlayOutEntityEquipment(entId, 4, CraftItemStack.asNMSCopy(player.getInventory().getChestplate()));
+    PacketPlayOutEntityEquipment leggings = new PacketPlayOutEntityEquipment(entId, 2, CraftItemStack.asNMSCopy(player.getInventory().getLeggings()));
+    PacketPlayOutEntityEquipment boots = new PacketPlayOutEntityEquipment(entId, 1, CraftItemStack.asNMSCopy(player.getInventory().getBoots()));
+    PacketPlayOutHeldItemSlot slot = new PacketPlayOutHeldItemSlot(player.getInventory().getHeldItemSlot());
+
+    for (Player players : Bukkit.getOnlinePlayers()) {
+      if (players instanceof NPCHolder) {
+        continue;
+      }
+      EntityPlayer eps = ((CraftPlayer) players).getHandle();
+
+      PlayerConnection con = eps.playerConnection;
+      if (players.equals(player)) {
+        con.sendPacket(removeInfo);
+        con.sendPacket(addInfo);
+        con.sendPacket(slot);
+        ((CraftPlayer) players).updateScaledHealth();
+        eps.triggerHealthUpdate();
+        if (players.isOp()) {
+          players.setOp(false);
+          player.setOp(true);
+        }
+        players.updateInventory();
+        Bukkit.getScheduler().runTask(Core.getInstance(), ep::updateAbilities);
+      } else {
+        if (players.canSee(player) && players.getWorld().equals(player.getWorld())) {
+          con.sendPacket(removeEntity);
+          con.sendPacket(removeInfo);
+          con.sendPacket(addInfo);
+          con.sendPacket(addNamed);
+          con.sendPacket(itemhand);
+          con.sendPacket(helmet);
+          con.sendPacket(chestplate);
+          con.sendPacket(leggings);
+          con.sendPacket(boots);
+        } else if (players.canSee(player)) {
+          con.sendPacket(removeInfo);
+          con.sendPacket(addInfo);
+        }
+      }
+    }
+  }
+
+  @Override
   public void updateNavigation(Object navigation) {
-    ((NavigationAbstract)navigation).k();
+    ((NavigationAbstract) navigation).k();
   }
 
 
@@ -242,7 +322,7 @@ public class NMSv1_8_R3 implements INMS {
 
   @Override
   public void sendTabListRemove(Player player, Collection<SkinnableEntity> skinnableEntities) {
-    SkinnableEntity[] skinnables = skinnableEntities.toArray(new SkinnableEntity[skinnableEntities.size()]);
+    SkinnableEntity[] skinnables = skinnableEntities.toArray(new SkinnableEntity[0]);
     EntityPlayer[] entityPlayers = new EntityPlayer[skinnableEntities.size()];
 
     for (int i = 0; i < skinnables.length; i++) {
@@ -480,11 +560,7 @@ public class NMSv1_8_R3 implements INMS {
   @Override
   public void refreshNPCSlot(org.bukkit.entity.Entity entity, int slot, ItemStack stack) {
 
-
-    net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) entity).getHandle();
-
     net.minecraft.server.v1_8_R3.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(stack);
-    ;
 
     PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment(entity.getEntityId(), slot, nmsItemStack);
     sendPacketNearby(null, entity.getLocation(), packet, 10);
@@ -549,7 +625,7 @@ public class NMSv1_8_R3 implements INMS {
 
   @Override
   public boolean isNavigationFinished(Object navigation) {
-    return ((NavigationAbstract)navigation).m();
+    return ((NavigationAbstract) navigation).m();
   }
 
   @Override

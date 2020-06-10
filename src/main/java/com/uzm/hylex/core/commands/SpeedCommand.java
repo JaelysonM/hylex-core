@@ -20,7 +20,7 @@ public class SpeedCommand implements CommandExecutor {
 
 		Player player = (Player) sender;
 		if (!player.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-			player.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+			player.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
 			return true;
 		}
 
@@ -32,10 +32,10 @@ public class SpeedCommand implements CommandExecutor {
 						player.sendMessage("§aVocê alterou sua velocidade de vôo para §f§n" + value + "§a.");
 						player.setFlySpeed(value);
 					} else {
-						player.sendMessage("§c[Hylex] O valor cedido deve ser um número entre 0 e 1.");
+						player.sendMessage("§c[Stone] O valor cedido deve ser um número entre 0 e 1.");
 					}
 				} else {
-					player.sendMessage("§c[Hylex] O valor cedido deve ser um número.");
+					player.sendMessage("§c[Stone] O valor cedido deve ser um número.");
 				}
 			} else {
 				help(player, label);

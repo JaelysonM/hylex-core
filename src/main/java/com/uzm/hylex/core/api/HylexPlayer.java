@@ -129,7 +129,9 @@ public class HylexPlayer {
   }
 
   public void destroy() {
-    this.player.getScoreboard().getTeam(getGroup().getOrder()).removePlayer(player);
+    if (player !=null) {
+      this.player.getScoreboard().getTeam(getGroup().getOrder()).removePlayer(player);
+    }
     this.name = null;
     this.player = null;
     this.group = null;
@@ -181,13 +183,12 @@ public class HylexPlayer {
   }
 
   public void setupPlayer() {
+    if (this.player== null) return;
+    this.player.setHealth(20.0D);
     this.player.setLevel(0);
     this.player.setExp(0.0F);
     this.player.setExhaustion(0.0F);
     this.player.resetMaxHealth();
-    this.player.setHealthScale(20.0D);
-    this.player.setHealth(20.0D);
-    this.player.setMaxHealth(20.0D);
     this.player.setFoodLevel(20);
     this.player.setGameMode(GameMode.ADVENTURE);
     this.player.getActivePotionEffects().forEach(effect -> this.player.removePotionEffect(effect.getType()));

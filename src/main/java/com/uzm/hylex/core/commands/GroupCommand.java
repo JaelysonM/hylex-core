@@ -18,7 +18,7 @@ public class GroupCommand implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
     if (!sender.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-      sender.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+      sender.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
       return true;
     }
 
@@ -59,7 +59,7 @@ public class GroupCommand implements CommandExecutor {
               return true;
             }
 
-            if (pg.ordinal() >= HylexPlayer.getByPlayer(player).getGroup().ordinal()) {
+            if (pg.ordinal() > HylexPlayer.getByPlayer(player).getGroup().ordinal()) {
               sender.sendMessage("§cVocê não possui permissão para realizar esta ação.");
               return true;
             }

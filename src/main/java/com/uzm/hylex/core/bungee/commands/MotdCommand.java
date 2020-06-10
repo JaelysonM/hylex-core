@@ -23,7 +23,7 @@ public class MotdCommand extends Command {
     player.sendMessage(TextComponent.fromLegacyText(""));
     player.sendMessage(TextComponent.fromLegacyText("  §e- §f/" + label + " list §7Liste todas as motds."));
     player.sendMessage(TextComponent
-      .fromLegacyText("  §e- §f/" + label + " add <motd> §7Adicione na lista uma motd. §8(<newline> Nova linha; <online> Jogadores online; <max> Máximo de jogadorez )"));
+      .fromLegacyText("  §e- §f/" + label + " add <motd> §7Adicione na lista uma motd. §8(<newline> Nova linha; <online> Jogadores online; <max> Máximo de jogadores )"));
     player.sendMessage(TextComponent.fromLegacyText("  §e- §f/" + label + " clear §7Limpe a lista de motds."));
     player.sendMessage(TextComponent.fromLegacyText(""));
   }
@@ -41,7 +41,7 @@ public class MotdCommand extends Command {
     }
 
     if (!sender.hasPermission("hylex.motd")) {
-      sender.sendMessage(TextComponent.fromLegacyText("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando."));
+      sender.sendMessage(TextComponent.fromLegacyText("§c[Stone] §cSem §c§npermissão §cpara executar esse comando."));
       return;
     }
 

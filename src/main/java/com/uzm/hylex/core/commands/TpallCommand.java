@@ -25,7 +25,7 @@ public class TpallCommand implements CommandExecutor {
     Player player = (Player) sender;
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
     if (!player.hasPermission(Core.getLoader().permissions.get(label.toLowerCase()))) {
-      player.sendMessage("§b[Hylex] §cSem §c§npermissão §cpara executar esse comando.");
+      player.sendMessage("§c[Stone] §cSem §c§npermissão §cpara executar esse comando.");
       return true;
     }
 

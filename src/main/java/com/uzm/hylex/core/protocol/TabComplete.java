@@ -1,4 +1,4 @@
-package com.uzm.hylex.core.listeners.protocol;
+package com.uzm.hylex.core.protocol;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
