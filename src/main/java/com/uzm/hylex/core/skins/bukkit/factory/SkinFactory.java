@@ -15,7 +15,7 @@ public abstract class SkinFactory {
      * @param props - Property Object
      */
     public void applySkin(final Player p, Object props) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Core.getInstance(), () -> {
+        Bukkit.getScheduler().scheduleAsyncDelayedTask(Core.getInstance(), () -> {
             try {
                 if (props == null)
                     return;

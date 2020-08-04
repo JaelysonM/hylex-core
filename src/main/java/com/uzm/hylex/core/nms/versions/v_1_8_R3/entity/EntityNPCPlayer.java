@@ -51,7 +51,7 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
   }
 
   protected void a(double d0, boolean flag, Block block, BlockPosition blockposition) {
-    if (npc == null || !npc.data().get(NPC.FLYABLE, false)) {
+    if (npc == null || !npc.isFlyable()) {
       super.a(d0, flag, block, blockposition);
     }
   }
@@ -83,7 +83,7 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
 
   @Override
   public void e(float f, float f1) {
-    if (npc == null || !npc.data().get(NPC.FLYABLE, false)) {
+    if (npc == null || !npc.isFlyable()) {
       super.e(f, f1);
     }
   }
@@ -111,10 +111,10 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
 
   @Override
   public void g(float f, float f1) {
-    if (npc == null || !npc.data().get(NPC.FLYABLE, false)) {
+    if (npc == null || !npc.isFlyable()) {
       super.g(f, f1);
     } else {
-      NMS.flyingMoveLogic(getBukkitEntity(), f, f1);
+      NMS.flyingMoveLogic(this, f, f1);
     }
   }
 
@@ -149,7 +149,7 @@ public class EntityNPCPlayer extends EntityPlayer implements NPCHolder, Skinnabl
 
   @Override
   public boolean k_() {
-    if (npc == null || !npc.data().get(NPC.FLYABLE, false)) {
+    if (npc == null || !npc.isFlyable()) {
       return super.k_();
     }
 

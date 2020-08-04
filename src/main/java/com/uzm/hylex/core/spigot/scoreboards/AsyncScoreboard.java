@@ -520,7 +520,7 @@ public class AsyncScoreboard {
       throw new IllegalStateException("This FastBoard is deleted");
     }
 
-    if (player.isOnline()) {
+    if ( player !=null && player.isOnline() ) {
       Object entityPlayer = PLAYER_GET_HANDLE.invoke(player);
       Object playerConnection = PLAYER_CONNECTION.get(entityPlayer);
       SEND_PACKET.invoke(playerConnection, packet);

@@ -69,9 +69,9 @@ public class ChatListener implements Listener {
           if (target != null) {
             HylexPlayer hp = HylexPlayer.getByPlayer(target);
             if (!hp.isAccountLoaded()) {
+              player.sendMessage(TextComponent.fromLegacyText("§cA conta desse jogador não carregou corretamente, tente novamente mais tarde."));
               return;
             }
-
             if (blockTell && command.equals("tell") && !args[1].equalsIgnoreCase(player.getName())) {
               if (!hp.getLobbiesContainer().canSendTell()) {
                 evt.setCancelled(true);

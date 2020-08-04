@@ -7,6 +7,7 @@ import com.uzm.hylex.core.api.container.*;
 import com.uzm.hylex.core.api.events.HylexPlayerLoadEvent;
 import com.uzm.hylex.core.api.interfaces.IArena;
 import com.uzm.hylex.core.api.interfaces.IArenaPlayer;
+import com.uzm.hylex.core.controllers.FakeController;
 import com.uzm.hylex.core.controllers.TagController;
 import com.uzm.hylex.core.utils.HylexMethods;
 import com.uzm.hylex.services.lan.WebSocket;
@@ -41,6 +42,8 @@ public class HylexPlayer {
   private IArena abstractArena;
   private Location[] temporaryLocation = new Location[2];
 
+
+
   public HylexPlayer(Player player) {
     this.player = player;
     this.name = player.getName();
@@ -65,12 +68,24 @@ public class HylexPlayer {
     this.arenaPlayer = arenaPlayer;
   }
 
+
+  public Map<String, Map<String, DataContainer>> getSchemas() {
+    return schemas;
+  }
+
   public void loadAccount() {
     this.accountLoaded = true;
-    Bukkit.getPluginManager().callEvent(new HylexPlayerLoadEvent(HylexPlayer.this));
     if (schemas.containsKey("Global_Profile")) {
       getLobbiesContainer().updateLastLogin();
     }
+    new BukkitRunnable() {
+      @Override
+      public void run() {
+        Bukkit.getPluginManager().callEvent(new HylexPlayerLoadEvent(HylexPlayer.this));
+      }
+    }.runTask(Core.getInstance());
+
+
 
   }
 
@@ -129,8 +144,15 @@ public class HylexPlayer {
   }
 
   public void destroy() {
-    if (player !=null) {
-      this.player.getScoreboard().getTeam(getGroup().getOrder()).removePlayer(player);
+    if (player != null) {
+      if (this.player.getScoreboard().getTeam(getGroup().getOrder()) != null) {
+        this.player.getScoreboard().getTeam(getGroup().getOrder()).removePlayer(player);
+      }
+      if (this.player.getScoreboard().getTeam(Group.NORMAL.getOrder()) != null) {
+        if (this.player.getScoreboard().getTeam(Group.NORMAL.getOrder()).hasPlayer(player)) {
+          this.player.getScoreboard().getTeam(Group.NORMAL.getOrder()).removePlayer(player);
+        }
+      }
     }
     this.name = null;
     this.player = null;
@@ -183,7 +205,8 @@ public class HylexPlayer {
   }
 
   public void setupPlayer() {
-    if (this.player== null) return;
+    if (this.player == null)
+      return;
     this.player.setHealth(20.0D);
     this.player.setLevel(0);
     this.player.setExp(0.0F);
@@ -208,8 +231,31 @@ public class HylexPlayer {
     controller.setOrder(this.group.getOrder());
     controller.setPrefix(this.group.getDisplay());
     controller.update();
+    this.player.setDisplayName(this.group.getDisplay() + this.player.getName());
+
+
+
+  }
+
+  public void setupPlayerWihoutTag() {
+    if (this.player == null)
+      return;
+    this.player.setHealth(20.0D);
+    this.player.setLevel(0);
+    this.player.setExp(0.0F);
+    this.player.setExhaustion(0.0F);
+    this.player.resetMaxHealth();
+    this.player.setFoodLevel(20);
+    this.player.setGameMode(GameMode.ADVENTURE);
+    this.player.getActivePotionEffects().forEach(effect -> this.player.removePotionEffect(effect.getType()));
+
+    this.player.getInventory().clear();
+    this.player.getInventory().setArmorContents(new ItemStack[4]);
 
     this.player.setDisplayName(this.group.getDisplay() + this.player.getName());
+
+
+
   }
 
   public DataContainer getDataContainer(String schema, String key) {
@@ -225,16 +271,13 @@ public class HylexPlayer {
   }
 
   public BedWarsStatisticsContainer getBedWarsStatistics() {
-    return
-      schemas.get("BedWarsData") !=null ?
-      this.getAbstractContainer("BedWarsData", "statistics", BedWarsStatisticsContainer.class): null;
+    return this.getAbstractContainer("BedWarsData", "statistics", BedWarsStatisticsContainer.class);
   }
 
 
 
   public LobbiesContainer getLobbiesContainer() {
-    return schemas.get("BedWarsData") !=null ?
-     this.getAbstractContainer("Global_Profile", "lobbys", LobbiesContainer.class): null;
+    return this.getAbstractContainer("Global_Profile", "lobbys", LobbiesContainer.class);
   }
 
 
@@ -267,13 +310,33 @@ public class HylexPlayer {
   }
 
   public List<HylexPlayer> getLastHitters() {
-    List<HylexPlayer> hitters = this.lastHit.entrySet().stream().filter(entry -> getByPlayer(entry.getKey()) != null).sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
-      .map(entry -> getByPlayer(entry.getKey())).collect(Collectors.toList());
+    List<HylexPlayer> hitters =
+      this.lastHit.entrySet().stream().filter(entry -> System.currentTimeMillis() <= entry.getValue()).filter(entry -> getByPlayer(entry.getKey()) != null)
+        .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())).map(entry -> getByPlayer(entry.getKey())).collect(Collectors.toList());
     this.lastHit.clear();
     return hitters;
   }
 
-  public static final List<UUID> STAFF = new ArrayList<>();
+  public void setVisibility(boolean invisible) {
+    if (invisible) {
+      if (!INVISIBLE.contains(getPlayer().getUniqueId())) {
+        INVISIBLE.add(getPlayer().getUniqueId());
+      }
+    } else {
+      INVISIBLE.remove(getPlayer().getUniqueId());
+    }
+  }
+
+
+  public static List<UUID> getInvisible() {
+    return ImmutableList.copyOf(INVISIBLE);
+  }
+
+  public boolean isInvisible() {return INVISIBLE.contains(getPlayer().getUniqueId());}
+
+
+  public static final LinkedHashSet<UUID> STAFF = new LinkedHashSet<>();
+  public static final List<UUID> INVISIBLE = new ArrayList<>();
   private static final Map<UUID, HylexPlayer> PLAYERS = new HashMap<>();
 
   public static HylexPlayer create(Player player) {
@@ -287,6 +350,7 @@ public class HylexPlayer {
 
   public static HylexPlayer remove(Player player) {
     STAFF.remove(player.getUniqueId());
+    INVISIBLE.remove(player.getUniqueId());
     return PLAYERS.remove(player.getUniqueId());
   }
 

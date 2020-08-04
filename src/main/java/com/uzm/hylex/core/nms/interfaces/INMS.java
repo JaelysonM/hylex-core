@@ -2,6 +2,7 @@ package com.uzm.hylex.core.nms.interfaces;
 
 import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
+import com.uzm.hylex.core.libraries.npclib.api.NPC;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.spigot.features.Titles;
 import net.minecraft.server.v1_8_R3.EntityInsentient;
@@ -22,81 +23,87 @@ import java.util.Collection;
 
 public interface INMS {
 
-    ItemStack glow(ItemStack stackToGlow);
+  ItemStack glow(ItemStack stackToGlow);
 
-    void sendTitle(Player player, Titles.TitleType type, String bottom, String top, int fadeIn, int stayTime, int fadeOut);
+  void sendTitle(Player player, Titles.TitleType type, String bottom, String top, int fadeIn, int stayTime, int fadeOut);
 
-    void sendActionBar(Player player, String message);
+  void sendActionBar(Player player, String message);
 
-    void sendTabColor(Player player, String footer, String bottom);
+  void sendTabColor(Player player, String footer, String bottom);
 
-    boolean addToWorld(World world, Entity entity, CreatureSpawnEvent.SpawnReason reason);
+  boolean addToWorld(World world, Entity entity, CreatureSpawnEvent.SpawnReason reason);
 
-
-    void setValueAndSignature(Player player, String value, String signature);
-
-    void sendTabListAdd(Player player, Player listPlayer);
-
-    void sendTabListRemove(Player player, Collection<SkinnableEntity> skinnableEntities);
-
-    void sendTabListRemove(Player player, Player listPlayer);
-
-    void sendPacket(Player player, Object packet);
-
-    SkinnableEntity getSkinnable(Entity entity);
-
-    void setHeadYaw(Entity entity, float yaw);
-
-    void setStepHeight(LivingEntity entity, float height);
-
-    float getStepHeight(LivingEntity entity);
-
-    void replaceTrackerEntry(Player player);
-
-    void removeFromPlayerList(Player type);
-
-    void flyingMoveLogic(LivingEntity entity, float f, float f1);
-
-    void removeFromServerPlayerList(Player player);
+  boolean addEntityToWorld(org.bukkit.entity.Entity entity, CreatureSpawnEvent.SpawnReason custom);
 
 
-    void removeFromWorld(Entity entity);
+  void setValueAndSignature(Player player, String value, String signature);
+
+  void sendTabListAdd(Player player, Player listPlayer);
+
+  void sendTabListRemove(Player player, Collection<SkinnableEntity> skinnableEntities);
+
+  void sendTabListRemove(Player player, Player listPlayer);
+
+  void sendPacket(Player player, Object packet);
+
+  SkinnableEntity getSkinnable(Entity entity);
+
+  void setHeadYaw(Entity entity, float yaw);
+
+  void setBodyYaw(Entity entity, float yaw);
+
+  void setStepHeight(Object entity, float height);
+
+  float getStepHeight(Object entity);
+
+  void replaceTrackerEntry(Player player);
+
+  void removeFromPlayerList(Player type);
+
+  void flyingMoveLogic(EntityLiving entity, float f, float f1);
+
+  void removeFromServerPlayerList(Player player);
+
+  void setSize(Object entity, float f, float f1, boolean justCreated);
 
 
-    void playAnimation(Entity entity, int id);
-
-    void sendPacketNearby(Player from, Location location, Object packet, double radius);
-
-    void sendPacketsNearby(Player from, Location location, Collection<Object> packets, double radius);
-
-    void refreshNPCSlot(Entity entity, int slot , ItemStack stack);
-
-    void look(org.bukkit.entity.Entity entity, float yaw, float pitch);
-
-    boolean isHologramEntity(Entity entity);
-
-    boolean isNavigationFinished(Object navigation);
+  void removeFromWorld(Entity entity);
 
 
-    Hologram getHologram(Entity entity);
+  void playAnimation(Entity entity, int id);
 
-    IArmorStand createArmorStand(Location location, String name, HologramLine line);
+  void sendPacketNearby(Player from, Location location, Object packet, double radius);
 
-    String[]getPlayerTextures(Player player);
+  void sendPacketsNearby(Player from, Location location, Collection<Object> packets, double radius);
 
-    void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate);
+  void refreshNPCSlot(Entity entity, int slot, ItemStack stack);
 
-    void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to);
+  void look(org.bukkit.entity.Entity entity, float yaw, float pitch);
 
-    void updateNavigation(Object navigation);
+  boolean isHologramEntity(Entity entity);
 
-    void updateAI(Object entity);
-
-    void clearPathfinderGoals(Object entity);
-
-    void refreshPlayer(Player player);
+  boolean isNavigationFinished(Object navigation);
 
 
+  Hologram getHologram(Entity entity);
+
+  IArmorStand createArmorStand(Location location, String name, HologramLine line);
+
+  String[] getPlayerTextures(Player player);
+
+  void look(org.bukkit.entity.Entity entity, Location to, boolean headOnly, boolean immediate);
+
+  void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to);
+
+  void updateNavigation(Object navigation);
+
+  void updateAI(Object entity);
+
+  void clearPathfinderGoals(Object entity);
+
+  void refreshPlayer(Player player);
+
+  String getSoundEffect(NPC npc, String snd, String meta);
 
 
 

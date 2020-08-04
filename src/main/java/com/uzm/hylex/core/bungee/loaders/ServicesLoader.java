@@ -5,6 +5,7 @@ import com.uzm.hylex.core.bungee.Bungee;
 import com.uzm.hylex.core.bungee.api.HylexPlayer;
 import com.uzm.hylex.core.bungee.controllers.QueueController;
 import com.uzm.hylex.services.lan.WebSocket;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -39,7 +40,6 @@ public class ServicesLoader {
       if (!(args[0] instanceof org.json.JSONObject)) {
         return;
       }
-
       try {
         JSONObject response = (JSONObject) new JSONParser().parse(args[0].toString());
 
@@ -53,8 +53,13 @@ public class ServicesLoader {
               hp.computeData(schema, (JSONObject) json.get("data"));
             }
           }
+          if (hp.getSchemas().size() >= 1) {
+            hp.loadAccount();
+          }else {
+            hp.getPlayer()
+              .disconnect(TextComponent.fromLegacyText("§c§lREDE STONE §c- Carregamento de dados\n\n§cPelo visto não conseguimos carregar sua conta\n§ccorretamente, isso se deve a diversos fatores tanto internos quanto externos.\n\n§cNos desculpe o incômodo, porém tentar se reconectar à nossa rede\n§cpode resolver o problema.\n\n§cSe esse problema for muito recorrente contate um superior.\n§c✰ Atenciosamente,Equipe de desenvolvimento Stone."));
+          }
 
-          hp.loadAccount();
         }
       } catch (Exception ex) {
         System.err.println("[Socket.io]  Não foi possível processar os dados recibos.");

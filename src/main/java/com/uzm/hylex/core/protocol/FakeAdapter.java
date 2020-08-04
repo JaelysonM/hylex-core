@@ -9,12 +9,10 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.controllers.FakeController;
-import net.minecraft.server.v1_8_R3.PacketPlayOutScoreboardTeam;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.comphenix.protocol.PacketType.Play.Server.*;
 
@@ -26,59 +24,57 @@ public class FakeAdapter extends PacketAdapter {
   @Override
   public void onPacketReceiving(PacketEvent evt) {
     PacketContainer packet = evt.getPacket();
-    if (packet.getType() == CHAT) {
+    if (packet.getType() == PacketType.Play.Client.CHAT) {
       packet.getStrings().write(0, FakeController.replaceNickedPlayers(packet.getStrings().read(0), false));
     }
   }
 
   @Override
   public void onPacketSending(PacketEvent evt) {
-    PacketContainer packet = evt.getPacket();
-
-    if (packet.getType() == TAB_COMPLETE) {
-      List<String> list = new ArrayList<>();
-      for (String complete : packet.getStringArrays().read(0)) {
-        list.add(FakeController.replaceNickedPlayers(complete, true));
-      }
-      packet.getStringArrays().write(0, list.toArray(new String[0]));
-    }
-    /*
-    else if (packet.getType() == PLAYER_INFO) {
-
-      List<PlayerInfoData> infoDataList = new ArrayList<>();
-      for (PlayerInfoData infoData : packet.getPlayerInfoDataLists().read(0)) {
-        WrappedGameProfile profile = infoData.getProfile();
-        if (FakeController.has(profile.getName())) {
-          infoData = new PlayerInfoData(profile, infoData.getLatency(), infoData.getGameMode(), infoData.getDisplayName());
+    try {
+      PacketContainer packet = evt.getPacket();
+      if (packet.getType() == TAB_COMPLETE) {
+        List<String> list = new ArrayList<>();
+        for (String complete : packet.getStringArrays().read(0)) {
+          list.add(FakeController.replaceNickedPlayers(complete, true));
         }
-        infoDataList.add(infoData);
-      }
-      packet.getPlayerInfoDataLists().write(0, infoDataList);
-    } else if (packet.getType() == CHAT) {
-      WrappedChatComponent component = packet.getChatComponents().read(0);
-      if (component != null) {
-        packet.getChatComponentArrays().write(0, WrappedChatComponent.fromChatMessage(FakeController.replaceNickedPlayers(component.getJson(), true)));
-      }
-    }
-    else if (packet.getType() == SCOREBOARD_OBJECTIVE) {
-      packet.getStrings().write(1, FakeController.replaceNickedPlayers(packet.getStrings().read(1), true));
-    } else if (packet.getType() == SCOREBOARD_SCORE) {
-      packet.getStrings().write(0, FakeController.replaceNickedPlayers(packet.getStrings().read(0), true));
-    }
 
+        packet.getStringArrays().write(0, list.toArray(new String[list.size()]));
+      } else if (packet.getType() == PLAYER_INFO) {
+        List<PlayerInfoData> infoDataList = new ArrayList<>();
+        for (PlayerInfoData infoData : packet.getPlayerInfoDataLists().read(0)) {
+          WrappedGameProfile profile = infoData.getProfile();
+          if (FakeController.has(profile.getName())) {
+            infoData = new PlayerInfoData(FakeController.cloneGameProfile(profile), infoData.getLatency(), infoData.getGameMode(), infoData.getDisplayName());
+          }
 
-     else if (packet.getType() == SCOREBOARD_TEAM) {
-      List<String> members = new ArrayList<>();
-
-      for (String member : (Collection<String>) packet.getModifier().withType(Collection.class).read(0)) {
-        if (FakeController.has(member)) {
-          member = FakeController.getFake(member);
+          infoDataList.add(infoData);
         }
-        members.add(member);
+
+        packet.getPlayerInfoDataLists().write(0, infoDataList);
+      } else if (packet.getType() == CHAT) {
+        WrappedChatComponent component = packet.getChatComponents().read(0);
+        if (component != null) {
+          packet.getChatComponents().write(0, WrappedChatComponent.fromJson(FakeController.replaceNickedPlayers(component.getJson(), true)));
+        }
+      } else if (packet.getType() == SCOREBOARD_OBJECTIVE) {
+        packet.getStrings().write(1, FakeController.replaceNickedPlayers(packet.getStrings().read(1), true));
+      } else if (packet.getType() == SCOREBOARD_SCORE) {
+        packet.getStrings().write(0, FakeController.replaceNickedPlayers(packet.getStrings().read(0), true));
+      } else if (packet.getType() == SCOREBOARD_TEAM) {
+        List<String> members = new ArrayList<>();
+        for (String member : (Collection<String>) packet.getModifier().withType(Collection.class).read(0)) {
+          if (FakeController.has(member)) {
+            member = FakeController.getFake(member);
+          }
+
+          members.add(member);
+        }
+
+        packet.getModifier().withType(Collection.class).write(0, members);
       }
-      packet.getModifier().withType(Collection.class).write(0, members);
-
-    }*/
-
+    }  catch (Exception ignore) {}
   }
+
+
 }

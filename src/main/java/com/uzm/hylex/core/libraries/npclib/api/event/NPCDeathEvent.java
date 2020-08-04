@@ -10,17 +10,12 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCDeathEvent extends NPCEvent implements Cancellable {
 
-  private NPC npc;
   private Player killer;
   private boolean cancelled;
 
   public NPCDeathEvent(NPC npc, Player killer) {
-    this.npc = npc;
+    super(npc);
     this.killer = killer;
-  }
-
-  public NPC getNPC() {
-    return npc;
   }
 
   public Player getKiller() {

@@ -18,7 +18,7 @@ public class LoginListener implements Listener {
     this.plugin = plugin;
   }
 
-  @EventHandler(priority = EventPriority.HIGH)
+  @EventHandler(priority = EventPriority.LOWEST)
   public void onServerChange(final LoginEvent e) {
     e.registerIntent(plugin);
     String nick = e.getConnection().getName();
@@ -33,6 +33,10 @@ public class LoginListener implements Listener {
       return;
     }
 
+    if (!validUsername(nick)) {
+      e.completeIntent(plugin);
+      return;
+    }
     // Don't change skin if player has no custom skin-name set and his username is invalid
     if (plugin.getSkinStorage().getPlayerSkin(nick) == null  && !validUsername(nick)) {
       System.out.println("[hylex-core Fork SkinsRestorer] Not applying skin to " + nick + " (invalid username).");
@@ -54,6 +58,9 @@ public class LoginListener implements Listener {
   }
 
   private static Pattern namePattern = Pattern.compile("^[a-zA-Z0-9_\\-]+$");
+  private static  Pattern PATTERN = Pattern.compile(
+    "^(Craft|Beach|Actor|Games|Tower|Elder|Mine|Nitro|Worms|Build|Plays|Hyper|Crazy|Super|_Itz|Slime)(Craft|Beach|Actor|Games|Tower|Elder|Mine|Nitro|Worms|Build|Plays|Hyper|Crazy|Super|_Itz|Slime)(11|50|69|99|88|HD|LP|XD|YT)");
+
 
   public static String c(String msg) {
     return msg.replaceAll("&", "§");
@@ -63,6 +70,10 @@ public class LoginListener implements Listener {
     if (username.length() > 16)
       return false;
 
-    return namePattern.matcher(username).matches();
+    if (PATTERN.matcher(username).find()) {
+      return false;
+    }else {
+      return namePattern.matcher(username).matches();
+    }
   }
 }

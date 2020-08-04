@@ -8,15 +8,10 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCDespawnEvent extends NPCEvent implements Cancellable {
 
-  private NPC npc;
   private boolean cancelled;
 
   public NPCDespawnEvent(NPC npc) {
-    this.npc = npc;
-  }
-
-  public NPC getNPC() {
-    return npc;
+    super(npc);
   }
 
   public void setCancelled(boolean cancelled) {

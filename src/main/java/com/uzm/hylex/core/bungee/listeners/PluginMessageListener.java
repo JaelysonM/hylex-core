@@ -39,24 +39,26 @@ public class PluginMessageListener implements Listener {
                 HylexPlayer.getByPlayer(pp).getLobbiesContainer().setToggleTell((Boolean) settings.get("tell"));
               }
 
-
-            } catch (Exception ignore) {
-              ignore.printStackTrace();
-            }
+            } catch (Exception ignore) {}
           } else if (subChannel.equals("Parties")) {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Parties");
+            JSONObject object = new JSONObject();
+            JSONArray array = new JSONArray();
             BungeePartyManager.listParties().forEach(bp -> {
               JSONObject json = new JSONObject();
               json.put("leader", bp.getLeader());
               JSONArray members = new JSONArray();
               bp.listMembers().stream().filter(PartyPlayer::isOnline).map(PartyPlayer::getName).forEach(members::add);
               json.put("members", members);
-              out.writeUTF(json.toString());
-              members.clear();
-              json.clear();
+              array.add(json);
             });
+            object.put("parties", array);
+            out.writeUTF(object.toJSONString());
             ((Server) evt.getSender()).sendData("hylex-core", out.toByteArray());
+
+
+
           } else if (subChannel.equals("SendPartyMembers")) {
             String leader = in.readUTF();
             BungeeParty party = BungeePartyManager.listParties().stream().filter(result -> result.getLeader().equalsIgnoreCase(leader)).findFirst().orElse(null);
@@ -71,8 +73,6 @@ public class PluginMessageListener implements Listener {
                     if (player.getServer().getInfo().getName().equals("auth")) {
                       return;
                     }
-
-                    System.out.println(player.getName());
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF("SendPartyMember");
                     out.writeUTF(player.getName());

@@ -10,6 +10,7 @@ import com.uzm.hylex.core.nms.NMS;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +19,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -72,6 +74,7 @@ public class NPCListeners implements Listener {
     this.updateTracker.onNPCSpawn(evt.getNPC());
   }
 
+
   @EventHandler(ignoreCancelled = true)
   public void onPlayerChangedWorld(PlayerChangedWorldEvent evt) {
     if (!NPCLibrary.isNPC(evt.getPlayer())) {
@@ -94,11 +97,6 @@ public class NPCListeners implements Listener {
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
   public void onPlayerJoin(PlayerJoinEvent evt) {
     this.updateTracker.updatePlayer(evt.getPlayer(), 20 * 6, true);
-    Team team = evt.getPlayer().getScoreboard().getTeam("mNPCS");
-
-    if (team == null) {
-
-    }
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -164,6 +162,7 @@ public class NPCListeners implements Listener {
     }
   }
 
+
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkLoad(ChunkLoadEvent evt) {
     respawnAllFromCoord(toCoord(evt.getChunk()));
@@ -188,6 +187,7 @@ public class NPCListeners implements Listener {
       }
     }
   }
+
 
   @EventHandler
   public void onEntityDamage(EntityDamageByEntityEvent evt) {
@@ -236,6 +236,7 @@ public class NPCListeners implements Listener {
       this.location = location;
     }
   }
+
 
   private static class ChunkCoord {
 

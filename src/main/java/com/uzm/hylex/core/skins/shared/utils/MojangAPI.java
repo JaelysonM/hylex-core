@@ -169,7 +169,7 @@ public class MojangAPI {
   }
 
   public String getUUIDMojang(String name, boolean tryNext) throws SkinRequestException {
-    this.logger.log("Trying Mojang API to get UUID for player " + name + ".");
+    //this.logger.log("Trying Mojang API to get UUID for player " + name + ".");
 
     String output;
     try {
@@ -201,7 +201,7 @@ public class MojangAPI {
   }
 
   public String getUUIDBackup(String name) throws SkinRequestException {
-    this.logger.log("Trying backup API to get UUID for player " + name + ".");
+   // this.logger.log("Trying backup API to get UUID for player " + name + ".");
 
     String output;
     try {

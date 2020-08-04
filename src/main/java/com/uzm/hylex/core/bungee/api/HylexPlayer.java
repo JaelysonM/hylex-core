@@ -2,6 +2,8 @@ package com.uzm.hylex.core.bungee.api;
 
 import com.google.common.collect.ImmutableList;
 import com.uzm.hylex.core.api.container.*;
+import com.uzm.hylex.core.libraries.npclib.api.npc.EntityController;
+import com.uzm.hylex.core.libraries.npclib.npc.EntityControllers;
 import com.uzm.hylex.services.lan.WebSocket;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.entity.Player;
@@ -131,7 +133,9 @@ public class HylexPlayer {
     this.lastTell.put(hitter, System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds));
   }
 
-
+  public Map<String, Map<String, DataContainer>> getSchemas() {
+    return schemas;
+  }
 
   public DataContainer getDataContainer(String schema, String key) {
     return this.schemas.get(schema).get(key);

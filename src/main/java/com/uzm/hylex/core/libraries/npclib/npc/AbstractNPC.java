@@ -1,7 +1,6 @@
 package com.uzm.hylex.core.libraries.npclib.npc;
 
 import com.google.common.base.Preconditions;
-import com.uzm.hylex.core.Core;
 import com.uzm.hylex.core.java.util.MathUtils;
 import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
 import com.uzm.hylex.core.libraries.npclib.api.NPC;
@@ -17,14 +16,13 @@ import com.uzm.hylex.core.libraries.npclib.trait.NPCTrait;
 import com.uzm.hylex.core.nms.NMS;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -61,31 +59,40 @@ public class AbstractNPC implements NPC {
   public boolean spawn(Location location) {
     Preconditions.checkNotNull(location, "A localizacao nao pode ser null!");
     Preconditions.checkState(!isSpawned(), "O npc ja esta spawnado!");
+
+    getTrait(CurrentLocation.class).setLocation(location);
     controller.spawn(location, this);
 
-    boolean couldSpawn = MathUtils.isLoaded(location) && NMS.addToWorld(location.getWorld(), controller.getBukkitEntity(), SpawnReason.CUSTOM);
+
+    getEntity().setMetadata("NPC", new FixedMetadataValue(NPCLibrary.getPlugin(), this));
+
+
+   boolean couldSpawn = !MathUtils.isLoaded(location) ? false : NMS.addEntityToWorld(getEntity(), SpawnReason.DEFAULT);
+    System.out.println(couldSpawn);
+
     if (couldSpawn) {
       SkinnableEntity entity = NMS.getSkinnable(getEntity());
       if (entity != null) {
         entity.getSkinTracker().onSpawnNPC();
       }
-    }
 
-    getTrait(CurrentLocation.class).setLocation(location);
-    if (!couldSpawn) {
+    } else {
       Bukkit.getPluginManager().callEvent(new NPCNeedsRespawnEvent(this));
       controller.remove();
       return false;
     }
+    getEntity().teleport(location);
+
+    NMS.setHeadYaw(getEntity(), location.getYaw());
+    NMS.setBodyYaw(getEntity(), location.getYaw());
+
+    getTrait(CurrentLocation.class).setLocation(getEntity().getLocation());
 
     NPCSpawnEvent event = new NPCSpawnEvent(this);
     if (event.isCancelled()) {
       controller.remove();
       return false;
     }
-
-    NMS.setHeadYaw(getEntity(), location.getYaw());
-    getEntity().setMetadata("NPC", new FixedMetadataValue(NPCLibrary.getPlugin(), this));
 
     for (NPCTrait trait : traits.values()) {
       trait.onSpawn();
@@ -104,7 +111,6 @@ public class AbstractNPC implements NPC {
       }
     }
 
-    getTrait(CurrentLocation.class).setLocation(getEntity().getLocation());
 
     return true;
   }
@@ -164,6 +170,8 @@ public class AbstractNPC implements NPC {
   public MetadataStore data() {
     return data;
   }
+
+
 
   private int ticksToUpdate;
 
@@ -285,7 +293,7 @@ public class AbstractNPC implements NPC {
 
   @Override
   public Entity getEntity() {
-    return controller.getBukkitEntity();
+    return controller == null ? null : controller.getBukkitEntity();
   }
 
   @Override
@@ -303,6 +311,10 @@ public class AbstractNPC implements NPC {
     return name;
   }
 
+  @Override
+  public boolean isFlyable() {
+    return data().get(NPC.FLYABLE, false);
+  }
 
   public void setName(String name) {
     this.name = name;

@@ -6,6 +6,7 @@ import com.mojang.authlib.properties.Property;
 import com.uzm.hylex.core.java.util.MathUtils;
 import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
+import com.uzm.hylex.core.libraries.npclib.api.NPC;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.nms.interfaces.IArmorStand;
 import com.uzm.hylex.core.nms.interfaces.INMS;
@@ -116,6 +117,11 @@ public class NMSv1_14_R1 implements INMS {
   }
 
   @Override
+  public boolean addEntityToWorld(org.bukkit.entity.Entity entity, CreatureSpawnEvent.SpawnReason custom) {
+    return false;
+  }
+
+  @Override
   public void setValueAndSignature(Player player, String value, String signature) {
     GameProfile profile = ((CraftPlayer) player).getProfile();
     if (value != null && signature != null) {
@@ -178,13 +184,18 @@ public class NMSv1_14_R1 implements INMS {
   }
 
   @Override
-  public void setStepHeight(LivingEntity entity, float height) {
-    ((CraftLivingEntity) entity).getHandle().K = height;
+  public void setBodyYaw(org.bukkit.entity.Entity entity, float yaw) {
+
   }
 
   @Override
-  public float getStepHeight(LivingEntity entity) {
-    return ((CraftLivingEntity) entity).getHandle().K;
+  public void setStepHeight(Object entity, float height) {
+
+  }
+
+  @Override
+  public float getStepHeight(Object entity) {
+    return 0;
   }
 
   @Override
@@ -199,14 +210,21 @@ public class NMSv1_14_R1 implements INMS {
   }
 
   @Override
-  public void flyingMoveLogic(LivingEntity entity, float f, float f1) {
+  public void flyingMoveLogic(net.minecraft.server.v1_8_R3.EntityLiving entity, float f, float f1) {
 
   }
+
+
 
   @Override
   public void removeFromServerPlayerList(Player player) {
     EntityPlayer ep = ((CraftPlayer) player).getHandle();
     ((CraftServer) Bukkit.getServer()).getHandle().players.remove(ep);
+  }
+
+  @Override
+  public void setSize(Object entity, float f, float f1, boolean justCreated) {
+
   }
 
   @Override
@@ -339,6 +357,11 @@ public class NMSv1_14_R1 implements INMS {
   @Override
   public void refreshPlayer(Player player) {
 
+  }
+
+  @Override
+  public String getSoundEffect(NPC npc, String snd, String meta) {
+    return null;
   }
 
 

@@ -9,11 +9,10 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCRightClickEvent extends NPCEvent {
 
-  private NPC npc;
   private Player player;
 
   public NPCRightClickEvent(NPC npc, Player clicked) {
-    this.npc = npc;
+    super(npc);
     this.player = clicked;
   }
 

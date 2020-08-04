@@ -26,6 +26,8 @@ public class TagController {
   }
 
   public void update() {
+    if (player == null)
+      return;
     if (this.team == null) {
       Team team = getTeam(this.player.getScoreboard(), this.order);
       team.setPrefix(prefix);

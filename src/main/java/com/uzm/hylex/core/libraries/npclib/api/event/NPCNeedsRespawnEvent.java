@@ -8,15 +8,11 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCNeedsRespawnEvent extends NPCEvent {
 
-  private NPC npc;
 
   public NPCNeedsRespawnEvent(NPC npc) {
-    this.npc = npc;
+    super(npc);
   }
 
-  public NPC getNPC() {
-    return npc;
-  }
 
   @Override
   public HandlerList getHandlers() {

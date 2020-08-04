@@ -4,20 +4,20 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public enum Group {
-  HYLEX("§6Master", "§6[Master] ", "*", 100),
-  DESENVOLVEDOR("§6Dev", "§6[Dev] ", "group.dev", 30),
-  GERENTE("§4Gerente", "§4[Gerente] ", "group.gerente", 25),
-  ADMIN("§9Admin", "§9[Admin] ", "group.admin", 20),
+  HYLEX("§6Master", "§6[Master] ", "*", 10),
+  DESENVOLVEDOR("§6Dev", "§6[Dev] ", "group.dev", 10),
+  GERENTE("§4Gerente", "§4[Gerente] ", "group.gerente", 10),
+  ADMIN("§9Admin", "§9[Admin] ", "group.admin", 10),
   MODERADOR("§2Moderador", "§2[Moderador] ", "group.mod", 10),
-  AJUDANTE("§eAjudante", "§e[Ajudante] ", "group.ajd", 7),
-  PASSE("§3Passe", "§3[Passe] ", "group.pass", 30),
-  STREAMER("§5Streamer", "§5[Streamer] ", "group.streamer", 25),
-  YOUTUBER("§cYoutuber", "§c[Youtuber] ", "group.youtuber", 20),
-  MINIYT("§cMiniYT", "§c[MiniYT] ", "group.miniyt", 15),
+  AJUDANTE("§eAjudante", "§e[Ajudante] ", "group.ajd", 10),
+  PASSE("§3Passe", "§3[Passe] ", "group.pass", 10),
+  STREAMER("§5Streamer", "§5[Streamer] ", "group.streamer", 10),
+  YOUTUBER("§cYoutuber", "§c[Youtuber] ", "group.youtuber", 10),
+  MINIYT("§cMiniYT", "§c[MiniYT] ", "group.miniyt", 10),
   EMERALD("§aEmerald", "§a[Emerald] ", "group.emerald", 10),
-  DIAMOND("§bDiamond", "§b[Diamond] ", "group.diamond", 7),
-  GOLD("§eGold", "§e[Gold] ", "group.gold", 5),
-  NORMAL("§7Normal", "§7", "group.normal", 3);
+  DIAMOND("§bDiamond", "§b[Diamond] ", "group.diamond", 10),
+  GOLD("§eGold", "§e[Gold] ", "group.gold", 10),
+  NORMAL("§7Normal", "§7", "group.normal", 10);
 
   private String color;
   private String display;

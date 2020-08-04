@@ -46,6 +46,8 @@ public interface NPC {
 
     String getName();
 
+    boolean isFlyable();
+
     public static final String PROTECTED_KEY = "protected",
             TAB_LIST_KEY = "hide-from-tablist",
             HIDE_BY_TEAMS_KEY = "hide-by-teams",
@@ -115,4 +117,5 @@ public interface NPC {
     static final String NPC_NAME = "npc-name";
 
     static final String SERVER_ITEM = "server-item";
+    static final String PUSHABLE = "pushable";
 }

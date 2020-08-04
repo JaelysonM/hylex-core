@@ -8,16 +8,12 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCSpawnEvent extends NPCEvent implements Cancellable {
 
-  private NPC npc;
   private boolean cancelled;
 
   public NPCSpawnEvent(NPC npc) {
-    this.npc = npc;
+    super(npc);
   }
 
-  public NPC getNPC() {
-    return npc;
-  }
 
   public void setCancelled(boolean cancelled) {
     this.cancelled = cancelled;

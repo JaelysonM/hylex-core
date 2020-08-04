@@ -55,7 +55,7 @@ public class ItemBuilder {
       EnchantmentStorageMeta enchantment = meta instanceof EnchantmentStorageMeta ? ((EnchantmentStorageMeta) meta) : null;
 
       if (split.length > 1) {
-        stack.setAmount(Math.min(Integer.parseInt(split[1]), 64));
+        stack.setAmount(Integer.parseInt(split[1]));
       }
 
       this.lore = new ArrayList<>();

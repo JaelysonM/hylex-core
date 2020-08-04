@@ -52,7 +52,7 @@ public class NPCLibrary {
     Preconditions.checkNotNull(name, "Nome nao pode ser null");
 
     EntityController controller = EntityControllers.getController(type);
-    NPC npc = new AbstractNPC(uuid, name, controller);
+    AbstractNPC npc = new AbstractNPC(uuid, name, controller);
     npcs.add(npc);
     return npc;
   }

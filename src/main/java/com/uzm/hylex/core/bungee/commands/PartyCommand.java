@@ -285,16 +285,19 @@ public class PartyCommand extends Command {
 
       HylexPlayer hp = HylexPlayer.getByPlayer(target);
       if (hp!=null) {
-        if (!hp.getLobbiesContainer().canSendParty()) {
-          player.sendMessage(TextComponent.fromLegacyText("§cVocê não pode convidar esse jogador."));
-          return;
+        if (hp.isAccountLoaded()) {
+          if (!hp.getLobbiesContainer().canSendParty()) {
+            player.sendMessage(TextComponent.fromLegacyText("§cEste jogador desativou os convites de party."));
+            return;
+          }
+        }else {
+          player.sendMessage(TextComponent.fromLegacyText("§cA conta desse jogador não carregou corretamente, tente novamente mais tarde."));
         }
         target.sendMessage(party.invite(target.getName()));
         player.sendMessage(
           TextComponent.fromLegacyText(" \n" + Group.getColored(action) + " §afoi convidado para a Party. Ele tem 60 segundos para aceitar ou negar esta solicitação.\n "));
-
       }else {
-        player.sendMessage(TextComponent.fromLegacyText("§cVocê não pode convidar esse jogador."));
+        player.sendMessage(TextComponent.fromLegacyText("§cUsuário não encontrado, ou a conta deste não foi carregada corretamente."));
       }
     }
   }

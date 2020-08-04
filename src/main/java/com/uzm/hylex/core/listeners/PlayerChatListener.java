@@ -2,7 +2,12 @@ package com.uzm.hylex.core.listeners;
 
 import com.google.common.collect.Maps;
 import com.uzm.hylex.core.Core;
+import com.uzm.hylex.core.libraries.npclib.NPCLibrary;
+import com.uzm.hylex.core.libraries.npclib.api.NPC;
+import com.uzm.hylex.core.nms.NMS;
+import com.uzm.hylex.core.nms.versions.v_1_8_R3.NMSv1_8_R3;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -94,6 +99,7 @@ public class PlayerChatListener implements Listener {
 
     List<String> lists = Arrays.asList(TO_DISABLE);
     if (lists.contains(command)) {
+      NMSv1_8_R3.createIronGolem(evt.getPlayer().getLocation());
       evt.setCancelled(true);
       player.sendMessage("§cO acesso a esse comando foi §cnegado§c.");
     }

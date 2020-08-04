@@ -9,17 +9,13 @@ import org.bukkit.event.HandlerList;
  */
 public class NPCLeftClickEvent extends NPCEvent {
 
-  private NPC npc;
   private Player player;
 
   public NPCLeftClickEvent(NPC npc, Player clicked) {
-    this.npc = npc;
+    super(npc);
     this.player = clicked;
   }
 
-  public NPC getNPC() {
-    return npc;
-  }
 
   public Player getPlayer() {
     return player;

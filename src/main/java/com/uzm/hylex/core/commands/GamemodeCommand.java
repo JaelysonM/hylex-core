@@ -53,7 +53,7 @@ public class GamemodeCommand implements CommandExecutor {
               }
               player.sendMessage("§eSeu modo de jogo foi alterado para §f§nSURVIVAL§e.");
               player.setGameMode(GameMode.SURVIVAL);
-              hp.broadcastAction(HylexMethods.StaffAction.GAMEMODE_PERPLAYER, player.getName(), "CRIATIVO");
+              hp.broadcastAction(HylexMethods.StaffAction.GAMEMODE_PERPLAYER, player.getName(), "SURVIVAL");
               break;
             case "spectator":
             case "3":
@@ -109,7 +109,7 @@ public class GamemodeCommand implements CommandExecutor {
               player.sendMessage("§eVocê alterou o modo de jogo de §f" + target.getName() + " §epara §f§nSURVIVAL§e.");
               target.sendMessage("§eSeu modo de jogo foi alterado para §f§nSURVIVAL§e por §f" + player.getName() + "§e.");
               target.setGameMode(GameMode.SURVIVAL);
-              hp.broadcastAction(HylexMethods.StaffAction.GAMEMODE, target.getName(), "CRIATIVO");
+              hp.broadcastAction(HylexMethods.StaffAction.GAMEMODE, target.getName(), "SURVIVAL");
               break;
             case "spectator":
             case "3":

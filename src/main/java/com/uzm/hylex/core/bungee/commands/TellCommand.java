@@ -48,6 +48,7 @@ public class TellCommand extends Command {
       default:
         HylexPlayer hp = HylexPlayer.getByPlayer((ProxiedPlayer) sender);
         if (!hp.isAccountLoaded()) {
+          sender.sendMessage(TextComponent.fromLegacyText("§cSua conta não está carregada, tente relogar pode resolver."));
           return;
         }
 

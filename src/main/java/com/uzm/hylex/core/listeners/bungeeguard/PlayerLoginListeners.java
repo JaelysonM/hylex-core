@@ -32,6 +32,9 @@ public class PlayerLoginListeners implements Listener {
       });
       return;
     }
+    if (!Core.BUNGEE_GUARD) {
+      return;
+    }
     Player player = e.getPlayer();
     try {
       gameProfile = (GameProfile) player.getClass().getDeclaredMethod("getProfile", new Class[0]).invoke(player, new Object[0]);

@@ -46,7 +46,7 @@ public abstract class Party {
   public TextComponent invite(String target) {
     this.invitesMap.put(target.toLowerCase(), System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(MINUTES_UNTIL_EXPIRE_INVITE));
     TextComponent component = new TextComponent("");
-    for (BaseComponent components : TextComponent.fromLegacyText(" \n§a" + this.leader.getColored() + " §aconvidou você para a Party dele!\n§7Você pode ")) {
+    for (BaseComponent components : TextComponent.fromLegacyText(" \n§a" + this.leader.getPrefixed() + " §aconvidou você para a Party dele!\n§7Você pode ")) {
       component.addExtra(components);
     }
     BaseComponent accept = new TextComponent("ACEITAR");
@@ -94,14 +94,14 @@ public abstract class Party {
 
     if (leader.equals(member)) {
       this.leader = this.members.get(0);
-      this.broadcast(" \n" + this.leader.getColored() + " §ase tornou o novo Líder da Party!\n ");
+      this.broadcast(" \n" + this.leader.getPrefixed() + " §ase tornou o novo Líder da Party!\n ");
     }
     this.broadcast(" \n" + Group.getColored(member) + " §asaiu da Party!\n ");
   }
 
   public void kick(String member) {
     this.members.stream().filter(pp -> pp.getName().equalsIgnoreCase(member)).findFirst().ifPresent(pp -> {
-      pp.sendMessage(" \n" + this.leader.getColored() + " §aexpulsou você da Party!\n ");
+      pp.sendMessage(" \n" + this.leader.getPrefixed() + " §aexpulsou você da Party!\n ");
       this.members.removeIf(pap -> pap.equals(pp));
     });
   }

@@ -9,12 +9,13 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class BungeePartyManager {
 
   private static ScheduledTask CLEAN_PARTIES;
-  private static final List<BungeeParty> BUNGEE_PARTIES = new ArrayList<>();
+  private static List<BungeeParty> BUNGEE_PARTIES = new ArrayList<>();
 
   public static BungeeParty createParty(ProxiedPlayer leader) {
     BungeeParty bp = new BungeeParty(leader.getName(), Group.getPlayerGroup(leader).getPartySize());
@@ -40,6 +41,7 @@ public class BungeePartyManager {
   }
 
   public static List<BungeeParty> listParties() {
+    BUNGEE_PARTIES.removeIf(Objects::isNull);
     return BUNGEE_PARTIES;
   }
 }

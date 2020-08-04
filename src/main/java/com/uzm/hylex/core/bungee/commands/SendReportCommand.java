@@ -99,10 +99,13 @@ public class SendReportCommand extends Command {
       if (players.hasPermission("hylex.staff")) {
         HylexPlayer hp = HylexPlayer.getByPlayer(players);
         if (hp != null) {
-          if (!hp.getLobbiesContainer().canSendReport()) {
-            return;
+          if (hp.isAccountLoaded()) {
+            if (!hp.getLobbiesContainer().canSendReport()) {
+              return;
+            }
+            players.sendMessage(report);
           }
-          players.sendMessage(report);
+
         }
 
       }

@@ -26,6 +26,7 @@ public class HylexMethods {
     GAMEMODE_PERPLAYER("§7[%player% alterou o modo de jogo para §n%loc%]"),
     FLY("§7[%player% alterou o modo de vôo de %actionname% para §n%loc%]"),
     FLY_PERPLAYER("§7[%player% alterou o modo de vôo para §n%loc%]"),
+    INVISIBLE("§7[%player% alterou o modo de visibilidade para §n%loc%]"),
     BUILD("§7[%player% alterou o modo de construção para §n%loc%]");
 
     private String message;

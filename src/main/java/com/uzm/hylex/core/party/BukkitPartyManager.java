@@ -27,36 +27,43 @@ public class BukkitPartyManager implements PluginMessageListener {
     if (channel.equals("hylex-core")) {
       ByteArrayDataInput in = ByteStreams.newDataInput(data);
       String subChannel = in.readUTF();
+      List<BukkitParty> parties = new ArrayList<>();
       if (subChannel.equals("Parties")) {
-        List<BukkitParty> parties = new ArrayList<>();
-        try {
-            while (true) {
-              JSONObject party = (JSONObject) new JSONParser().parse(in.readUTF());
-              BukkitParty bp = new BukkitParty(party.get("leader").toString());
-              for (Object object : (JSONArray) party.get("members")) {
-                if (!bp.isMember(object.toString())) {
-                  bp.listMembers().add(bp.buildPlayer(object.toString()));
+
+        Bukkit.getScheduler().runTaskAsynchronously(Core.getInstance(), () -> {
+          try {
+            String arrayParties = in.readUTF();
+            Object objectJSON = new JSONParser().parse(arrayParties);
+            Object objectArray = ((JSONObject) objectJSON).get("parties");
+            for (Object partys : (JSONArray) objectArray) {
+              {
+                JSONObject party = (JSONObject) partys;
+
+                BukkitParty bp = new BukkitParty(party.get("leader").toString());
+                for (Object object : (JSONArray) party.get("members")) {
+                  if (!bp.isMember(object.toString())) {
+                    bp.listMembers().add(bp.buildPlayer(object.toString()));
+                  }
                 }
+                parties.add(bp);
               }
-              parties.add(bp);
             }
-
-
-
-        } catch (Exception ignore) {}
-        List<BukkitParty> oldParties = BUKKIT_PARTIES;
-        BUKKIT_PARTIES = parties;
-        oldParties.forEach(BukkitParty::delete);
-        oldParties.clear();
+            List<BukkitParty> oldParties = BUKKIT_PARTIES;
+            BUKKIT_PARTIES = parties;
+            oldParties.forEach(BukkitParty::delete);
+            oldParties.clear();
+          } catch (Exception ignore) {
+            List<BukkitParty> oldParties = BUKKIT_PARTIES;
+            BUKKIT_PARTIES = parties;
+            oldParties.forEach(BukkitParty::delete);
+            oldParties.clear();
+          }
+        });
       }
     }
   }
 
   public static void enableRequests() {
-    /*
-      TODO Temporary disabled
-     */
-    if (true) return;
     if (REQUEST_PARTIES == null) {
       REQUEST_PARTIES = new BukkitRunnable() {
         @Override
@@ -65,7 +72,6 @@ public class BukkitPartyManager implements PluginMessageListener {
           if (!iterator.hasNext()) {
             return;
           }
-
           ByteArrayDataOutput out = ByteStreams.newDataOutput();
           out.writeUTF("Parties");
           iterator.next().sendPluginMessage(Core.getInstance(), "hylex-core", out.toByteArray());

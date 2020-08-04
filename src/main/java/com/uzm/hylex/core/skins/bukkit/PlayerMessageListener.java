@@ -22,7 +22,6 @@ public class PlayerMessageListener implements PluginMessageListener {
       if (subChannel.equals("SkinUpdate")) {
         core.getFactory().applySkin(player, core.getSkinStorage().createProperty(in.readUTF(), in.readUTF(), in.readUTF()));
         core.getFactory().updateSkin(player);
-        System.out.println("chegou");
       }
     }
   }

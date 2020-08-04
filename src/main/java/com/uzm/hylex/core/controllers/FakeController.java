@@ -30,12 +30,12 @@ public class FakeController {
 
 
   public static void apply(Player player, String fakeName) {
-   // player.kickPlayer(StringUtils.formatColors("§6[HylexMC - Disfarçe]\n\n§cVocê foi expulso para que possamos aplicar seu disfarçe."));
+    //player.kickPlayer(StringUtils.formatColors("§6[HylexMC - Disfarçe]\n\n§cVocê foi expulso para que possamos aplicar seu disfarçe."));
     fakeNames.put(player.getName(), fakeName);
   }
 
   public static void remove(Player player) {
-   // player.kickPlayer(StringUtils.formatColors("§6[HylexMC - Disfarçe]\n\n§cVocê foi expulso para que possamos remover seu disfarçe."));
+    //player.kickPlayer(StringUtils.formatColors("§6[HylexMC - Disfarçe]\n\n§cVocê foi expulso para que possamos remover seu disfarçe."));
     fakeNames.remove(player.getName());
   }
 
@@ -44,7 +44,7 @@ public class FakeController {
   }
 
   public static String getFake(String playerName) {
-    return fakeNames.getOrDefault(playerName, null);
+    return fakeNames.get(playerName);
   }
 
   public static boolean has(String playerName) {
@@ -56,7 +56,7 @@ public class FakeController {
   }
 
   public static List<String> listNicked() {
-    return new ArrayList<>(fakeNames.values());
+    return new ArrayList<>(fakeNames.keySet());
   }
 
   public static String replaceNickedPlayers(String original, boolean toFake) {
@@ -76,20 +76,10 @@ public class FakeController {
     }
     return replaced;
   }
+
   @Beta
   public static WrappedGameProfile cloneGameProfile(WrappedGameProfile profile) {
     WrappedGameProfile gameProfile = profile.withName(getFake(profile.getName()));
-    gameProfile.getProperties().clear();
-
-    gameProfile.getProperties().get("getValue");
-    gameProfile.getProperties().get("getSignature");
-    try {
-      String id = Mojang.getUUID(gameProfile.getName());
-      if (id != null) {
-        //String textures
-      }
-    } catch (InvalidMojangException ignore) {}
-
 
     return gameProfile;
   }

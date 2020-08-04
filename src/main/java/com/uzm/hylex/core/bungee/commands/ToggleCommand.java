@@ -47,15 +47,16 @@ public class ToggleCommand extends Command {
 
     HylexPlayer hp = HylexPlayer.getByPlayer(player);
 
-    if (hp ==null) {
+    if (hp !=null) {
       if (!hp.isAccountLoaded()) {
+        sender.sendMessage(TextComponent.fromLegacyText("§cSua conta não está carregada, tente relogar pode resolver."));
         return;
       }
     }
 
     switch (args.length) {
       case 2:
-        Boolean b = Boolean.parseBoolean(args[1]);
+        boolean b = Boolean.parseBoolean(args[1]);
         switch (args[0].toLowerCase()) {
           case "tell":
                hp.getLobbiesContainer().setToggleTell(b);

@@ -13,8 +13,7 @@ import java.util.UUID;
 public class ServicesLoader {
 
   public ServicesLoader(PluginLoader loader) {
-    WebSocket socket =
-      WebSocket.create("core-" + Core.SOCKET_NAME, ConfigurationCreator.find("setup", loader.getCore()).get().getString("server-configuration.services-address"));
+    WebSocket socket = WebSocket.create("core-" + Core.SOCKET_NAME, ConfigurationCreator.find("setup", loader.getCore()).get().getString("server-configuration.services-address"));
     socket.addQueryParam("?server=core-" + Core.SOCKET_NAME);
     socket.addQueryParam("&arenaClient=" + Core.IS_ARENA_CLIENT);
 
@@ -32,7 +31,6 @@ public class ServicesLoader {
       if (!(args[0] instanceof org.json.JSONObject)) {
         return;
       }
-
       try {
         JSONObject response = (JSONObject) new JSONParser().parse(args[0].toString());
 
@@ -46,12 +44,14 @@ public class ServicesLoader {
               hp.computeData(schema, (JSONObject) json.get("data"));
             }
           }
-
-          hp.loadAccount();
+          if (hp.getSchemas().size() > 0) {
+            hp.loadAccount();
+          }else {
+            hp.getPlayer().kickPlayer("§c§lREDE STONE §c- Carregamento de dados\n\n§cPelo visto não conseguimos carregar sua conta\n§ccorretamente, isso se deve a diversos fatores tanto internos quanto externos.\n\n§cNos desculpe o incômodo, porém tentar se reconectar à nossa rede\n§cpode resolver o problema.\n\n§cSe esse problema for muito recorrente contate um superior.\n§c✰ Atenciosamente,Equipe de desenvolvimento Stone.");
+          }
         }
       } catch (Exception ex) {
-        ex.printStackTrace();
-        System.err.println("[Hylex - Socket.io ]  Não foi possível processar os dados recibos.");
+        System.err.println("[Socket.io - DataController]  Não foi possível processar os dados recibos.");
       }
     });
   }

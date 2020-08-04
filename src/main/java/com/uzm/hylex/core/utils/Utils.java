@@ -1,9 +1,14 @@
 package com.uzm.hylex.core.utils;
 
+import com.uzm.hylex.core.libraries.npclib.api.NPC;
+import com.uzm.hylex.core.libraries.npclib.api.event.NPCCollisionEvent;
+import com.uzm.hylex.core.libraries.npclib.api.event.NPCPushEvent;
 import com.uzm.hylex.core.nms.NMS;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.util.Vector;
 
 import java.util.regex.Pattern;
 
@@ -20,6 +25,20 @@ public class Utils {
 
     return namePattern.matcher(username).matches();
   }
+
+
+  public static NPCPushEvent callPushEvent(NPC npc, Vector vector) {
+    NPCPushEvent event = new NPCPushEvent(npc, vector);
+    event.setCancelled(npc.data().get(NPC.DEFAULT_PROTECTED_METADATA, true));
+    Bukkit.getPluginManager().callEvent(event);
+    return event;
+  }
+  public static void callCollisionEvent(NPC npc, Entity entity) {
+    if (NPCCollisionEvent.getHandlerList().getRegisteredListeners().length > 0) {
+      Bukkit.getPluginManager().callEvent(new NPCCollisionEvent(npc, entity));
+    }
+  }
+
 
   public static void faceEntity(Entity entity, Entity at) {
     if (at == null || entity == null || entity.getWorld() != at.getWorld())

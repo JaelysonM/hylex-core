@@ -3,6 +3,7 @@ package com.uzm.hylex.core.nms;
 
 import com.uzm.hylex.core.libraries.holograms.api.Hologram;
 import com.uzm.hylex.core.libraries.holograms.api.HologramLine;
+import com.uzm.hylex.core.libraries.npclib.api.NPC;
 import com.uzm.hylex.core.libraries.npclib.npc.skin.SkinnableEntity;
 import com.uzm.hylex.core.nms.interfaces.IArmorStand;
 import com.uzm.hylex.core.nms.interfaces.INMS;
@@ -11,6 +12,7 @@ import com.uzm.hylex.core.nms.versions.v_1_8_R3.NMSv1_8_R3;
 import com.uzm.hylex.core.nms.versions.v_1_8_R3.utils.SkinFactory;
 import com.uzm.hylex.core.spigot.enums.MinecraftVersion;
 import com.uzm.hylex.core.spigot.features.Titles;
+import net.minecraft.server.v1_8_R3.EntityLiving;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -57,6 +59,9 @@ public class NMS {
     return nms.addToWorld(world, entity, reason);
   }
 
+  public static boolean addEntityToWorld(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
+    return nms.addEntityToWorld(entity, reason) ;}
+
   public static void setValueAndSignature(Player player, String value, String signature) {
     nms.setValueAndSignature(player, value, signature);
   }
@@ -85,8 +90,11 @@ public class NMS {
   public static void setHeadYaw(org.bukkit.entity.Entity entity, float yaw) {
     nms.setHeadYaw(entity, yaw);
   }
+  public static void setBodyYaw(org.bukkit.entity.Entity entity, float yaw) {
+    nms.setBodyYaw(entity, yaw);
+  }
 
-  public static void setStepHeight(LivingEntity entity, float height) {
+  public static void setStepHeight(Object entity, float height) {
     nms.setStepHeight(entity, height);
   }
 
@@ -98,7 +106,7 @@ public class NMS {
     nms.replaceTrackerEntry(player);
   }
 
-  public static void flyingMoveLogic(LivingEntity entity, float f, float f1) {
+  public static void flyingMoveLogic(EntityLiving entity, float f, float f1) {
     nms.flyingMoveLogic(entity, f, f1);
   }
 
@@ -110,6 +118,7 @@ public class NMS {
   public static void updateAI(Object entity) {
     nms.updateAI(entity);
   }
+
   public static void updateNavigation(Object navigation) {
     nms.updateNavigation(navigation);
   }
@@ -172,7 +181,7 @@ public class NMS {
   }
 
   public static void applySkin(Player p, Object props) {
-     factory.applySkin(p,props);
+    factory.applySkin(p, props);
   }
 
   public static void removeSkin(Player p) {
@@ -186,10 +195,18 @@ public class NMS {
   public static void clearPathfinderGoals(Object entity) {
     nms.clearPathfinderGoals(entity);
   }
+
   public static void refreshPlayer(Player player) {
     nms.refreshPlayer(player);
   }
 
+  public static String getSoundEffect(NPC npc, String snd, String meta) {
+    return nms.getSoundEffect(npc, snd, meta);
+  }
+
+  public static void setSize(Object entity, float f, float f1, boolean justCreated) {
+    nms.setSize(entity, f, f1, justCreated);
+  }
 
 
 
